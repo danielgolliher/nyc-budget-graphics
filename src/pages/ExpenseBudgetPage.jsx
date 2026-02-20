@@ -14,6 +14,7 @@ export default function ExpenseBudgetPage() {
       </div>
 
       <BudgetPieChart
+        chartId="fy2027-pie"
         title="FY2027 Preliminary Expense Budget"
         subtitle={`Net Total: $${(fy2027.netTotal / 1e9).toFixed(1)} Billion — By Agency`}
         note="Excludes ($1.06B) Citywide Savings Initiatives offset not yet allocated to agencies."
@@ -22,6 +23,7 @@ export default function ExpenseBudgetPage() {
       />
 
       <BudgetPieChart
+        chartId="fy2026-pie"
         title="FY2026 Adopted Expense Budget"
         subtitle={`Net Total: $${(fy2026.netTotal / 1e9).toFixed(1)} Billion — By Agency`}
         agencies={fy2026.agencies}

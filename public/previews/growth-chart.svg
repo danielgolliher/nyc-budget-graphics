@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 140">
+  <rect width="200" height="140" fill="#0a0a0f" rx="4"/>
+  <!-- Grid lines -->
+  <line x1="30" y1="25" x2="185" y2="25" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
+  <line x1="30" y1="50" x2="185" y2="50" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
+  <line x1="30" y1="75" x2="185" y2="75" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
+  <line x1="30" y1="100" x2="185" y2="100" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
+  <!-- 0% growth - flat line -->
+  <path d="M30,100 L185,100" fill="none" stroke="#E63946" stroke-width="2" opacity="0.8"/>
+  <!-- 1% growth - gentle curve -->
+  <path d="M30,100 Q107,95 185,88" fill="none" stroke="#457B9D" stroke-width="2" opacity="0.8"/>
+  <!-- 5% growth - steep exponential curve -->
+  <path d="M30,100 Q90,90 130,70 T185,20" fill="none" stroke="#2A9D8F" stroke-width="2" opacity="0.8"/>
+  <!-- Axis labels -->
+  <text x="30" y="118" fill="rgba(255,255,255,0.4)" font-size="7" font-family="monospace">0</text>
+  <text x="185" y="118" fill="rgba(255,255,255,0.4)" font-size="7" font-family="monospace" text-anchor="end">yrs</text>
+  <!-- Title hint -->
+  <text x="15" y="14" fill="rgba(255,255,255,0.5)" font-size="8" font-family="sans-serif" font-weight="500">Growth Chart</text>
+</svg>

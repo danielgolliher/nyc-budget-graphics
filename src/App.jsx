@@ -1,16 +1,33 @@
-import { Routes, Route } from 'react-router-dom'
+import { Suspense } from 'react'
+import { Routes, Route, useLocation } from 'react-router-dom'
 import Layout from './components/Layout'
-import ExpenseBudgetPage from './pages/ExpenseBudgetPage'
+import HomePage from './pages/HomePage'
+import categories from './categories'
 
 export default function App() {
+  const location = useLocation()
+  const isEmbed = location.pathname.startsWith('/embed/')
+
   return (
-    <Layout>
-      <Routes>
-        <Route path="/" element={<ExpenseBudgetPage />} />
-        {/* Future pages go here, e.g.: */}
-        {/* <Route path="/revenue" element={<RevenuePage />} /> */}
-        {/* <Route path="/headcount" element={<HeadcountPage />} /> */}
-      </Routes>
-    </Layout>
+    <Suspense fallback={<div className="page-container">Loading…</div>}>
+      {isEmbed ? (
+        <div className="embed-wrapper">
+          <Routes>
+            {categories.map(({ slug, component: Page }) => (
+              <Route key={slug} path={`/embed/${slug}`} element={<Page />} />
+            ))}
+          </Routes>
+        </div>
+      ) : (
+        <Layout>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            {categories.map(({ slug, component: Page }) => (
+              <Route key={slug} path={`/${slug}`} element={<Page />} />
+            ))}
+          </Routes>
+        </Layout>
+      )}
+    </Suspense>
   )
 }

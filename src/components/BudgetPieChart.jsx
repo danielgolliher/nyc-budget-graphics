@@ -1,5 +1,7 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef } from 'react'
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Sector } from 'recharts'
+import useContainerSize from '../hooks/useContainerSize'
+import ShareMenu from './ShareMenu'
 
 const PALETTE = [
   '#1e3a5f', '#2563eb', '#3b82f6', '#60a5fa', '#93c5fd',
@@ -60,9 +62,15 @@ function ChartTooltip({ active, payload, netTotal }) {
  *   agencies    — array of { name: string, value: number } (positive values only for pie)
  *   netTotal    — the net total budget number (used for % calculations)
  */
-export default function BudgetPieChart({ title, subtitle, note, agencies, netTotal }) {
+export default function BudgetPieChart({ chartId, title, subtitle, note, agencies, netTotal }) {
   const [activeIndex, setActiveIndex] = useState(null)
   const [threshold, setThreshold] = useState(1.0)
+  const { ref: pieRef, width: containerWidth } = useContainerSize()
+  const cardRef = useRef(null)
+
+  const outerRadius = Math.min(175, Math.floor(containerWidth / 2) - 16) || 175
+  const innerRadius = Math.round(outerRadius * 72 / 175)
+  const chartHeight = Math.max(260, 2 * (outerRadius + 13) + 40)
 
   const positiveAgencies = useMemo(() =>
     agencies.filter(d => d.value > 0).sort((a, b) => b.value - a.value),
@@ -80,7 +88,8 @@ export default function BudgetPieChart({ title, subtitle, note, agencies, netTot
   }, [positiveAgencies, netTotal, threshold])
 
   return (
-    <div className="chart-card">
+    <div className="chart-card" ref={cardRef}>
+      <ShareMenu chartRef={cardRef} chartId={chartId} title={title} />
       <h2>{title}</h2>
       <p className="chart-subtitle">{subtitle}</p>
       {note && <p className="chart-note">{note}</p>}
@@ -98,13 +107,13 @@ export default function BudgetPieChart({ title, subtitle, note, agencies, netTot
       </div>
 
       <div className="chart-layout">
-        <div className="chart-pie-area">
-          <ResponsiveContainer width="100%" height={440}>
+        <div className="chart-pie-area" ref={pieRef}>
+          <ResponsiveContainer width="100%" height={chartHeight}>
             <PieChart>
               <Pie
                 data={display} dataKey="value"
                 cx="50%" cy="50%"
-                innerRadius={72} outerRadius={175}
+                innerRadius={innerRadius} outerRadius={outerRadius}
                 paddingAngle={0.4}
                 activeIndex={activeIndex}
                 activeShape={ActiveShape}
