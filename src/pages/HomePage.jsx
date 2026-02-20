@@ -7,7 +7,7 @@ export default function HomePage() {
       <div className="page-header">
         <h1>Maximum New York Data Viz</h1>
         <p className="subtitle">
-          Interactive data visualizations from Maximum New York.
+          Created to support posts on the <a href="https://maximumnewyork.com" target="_blank" rel="noopener noreferrer">Maximum New York</a> site, and for general fun and interest.
         </p>
       </div>
 
