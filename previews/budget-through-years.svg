@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 140">
+  <rect width="200" height="140" fill="#0B1120" rx="4"/>
+  <!-- Grid lines -->
+  <line x1="25" y1="25" x2="185" y2="25" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
+  <line x1="25" y1="50" x2="185" y2="50" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
+  <line x1="25" y1="75" x2="185" y2="75" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
+  <line x1="25" y1="100" x2="185" y2="100" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
+  <!-- Mayor term dividers -->
+  <line x1="31" y1="20" x2="31" y2="110" stroke="rgba(148,163,184,0.12)" stroke-width="0.5" stroke-dasharray="3 2"/>
+  <line x1="105" y1="20" x2="105" y2="110" stroke="rgba(148,163,184,0.12)" stroke-width="0.5" stroke-dasharray="3 2"/>
+  <line x1="155" y1="20" x2="155" y2="110" stroke="rgba(148,163,184,0.12)" stroke-width="0.5" stroke-dasharray="3 2"/>
+  <!-- Area fill -->
+  <path d="M25,98 L31,95 L38,92 L44,88 L51,84 L57,82 L64,75 L70,74 L77,74 L83,72 L90,69 L96,67 L103,66 L109,62 L116,59 L122,56 L129,53 L135,50 L142,47 L148,52 L155,42 L161,39 L168,35 L174,32 L181,29 L185,28 L185,110 L25,110 Z" fill="url(#budgetFill)" opacity="0.6"/>
+  <!-- Area line -->
+  <path d="M25,98 L31,95 L38,92 L44,88 L51,84 L57,82 L64,75 L70,74 L77,74 L83,72 L90,69 L96,67 L103,66 L109,62 L116,59 L122,56 L129,53 L135,50 L142,47 L148,52 L155,42 L161,39 L168,35 L174,32 L181,29 L185,28" fill="none" stroke="#D97706" stroke-width="1.5"/>
+  <!-- Dots at key points -->
+  <circle cx="25" cy="98" r="2" fill="#6B7280"/>
+  <circle cx="64" cy="75" r="2" fill="#2563EB"/>
+  <circle cx="109" cy="62" r="2" fill="#059669"/>
+  <circle cx="148" cy="52" r="2" fill="#059669"/>
+  <circle cx="185" cy="28" r="2" fill="#D97706"/>
+  <!-- Axis labels -->
+  <text x="25" y="122" fill="rgba(255,255,255,0.4)" font-size="7" font-family="monospace">'02</text>
+  <text x="185" y="122" fill="rgba(255,255,255,0.4)" font-size="7" font-family="monospace" text-anchor="end">'26</text>
+  <!-- Title -->
+  <text x="15" y="14" fill="rgba(255,255,255,0.5)" font-size="8" font-family="sans-serif" font-weight="500">Budget Through the Years</text>
+  <defs>
+    <linearGradient id="budgetFill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#D97706" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#D97706" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+</svg>
