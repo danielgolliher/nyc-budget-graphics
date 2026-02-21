@@ -1,4 +1,5 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
+import ShareMenu from "./ShareMenu";
 import {
   AreaChart,
   Area,
@@ -205,6 +206,9 @@ export default function NYCBudgetChart() {
   const [lockedBudget, setLockedBudget] = useState(null);
   const [lockedPct, setLockedPct] = useState(null);
 
+  const chart1Ref = useRef(null);
+  const chart2Ref = useRef(null);
+
   const handleMayorSelect = (mayorName) => {
     if (mayorName === null || mayorName === selectedMayor) {
       setSelectedMayor(null);
@@ -339,85 +343,90 @@ export default function NYCBudgetChart() {
           </div>
         </div>
 
-        {/* ═══ CHART 1 ═══ */}
-        <h2 style={{ fontFamily: serif, fontSize: "20px", color: "#E2E8F0", fontWeight: 600, margin: "0 0 6px 0" }}>Total Adopted Budget</h2>
-        <div style={{ background: lockedBudget ? "rgba(15,23,42,0.95)" : "rgba(15,23,42,0.8)", border: `1px solid ${lockedBudget ? "rgba(96,165,250,0.3)" : "rgba(51,65,85,0.4)"}`, borderRadius: "10px", padding: "12px 18px", marginBottom: "6px", minHeight: "58px", transition: "border-color 0.2s, background 0.2s" }}>
-          <DetailPanel data={displayBudget} label="budget" locked={!!lockedBudget} onUnlock={() => setLockedBudget(null)} />
-        </div>
-        <div style={{ background: "rgba(15,23,42,0.6)", border: "1px solid rgba(51,65,85,0.4)", borderRadius: "14px", padding: "24px 12px 16px 0", cursor: "crosshair" }}
-          onMouseLeave={() => { if (!lockedBudget) setHoveredBudget(null); }}>
-          <ResponsiveContainer width="100%" height={380}>
-            <AreaChart data={budgetData} margin={{ top: 16, right: 24, left: 16, bottom: 8 }} onMouseMove={lockedBudget ? undefined : handleBudgetHover} onClick={handleBudgetClick}>
-              <defs>
-                <linearGradient id="budgetGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor={chartColor} stopOpacity={0.25} />
-                  <stop offset="50%" stopColor={chartColor} stopOpacity={0.08} />
-                  <stop offset="100%" stopColor={chartColor} stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid stroke="rgba(51,65,85,0.3)" strokeDasharray="3 3" vertical={false} />
-              <XAxis dataKey="fy" stroke="#334155" tick={{ fill: "#64748B", fontSize: 11, fontFamily: mono }} tickLine={false} axisLine={{ stroke: "#334155" }} tickFormatter={(v) => `'${String(v).slice(2)}`} interval={Math.max(1, Math.floor(budgetData.length / 14))} />
-              <YAxis stroke="#334155" tick={{ fill: "#64748B", fontSize: 11, fontFamily: mono }} tickLine={false} axisLine={false} tickFormatter={(v) => `$${v}B`} domain={[yMin, yMax]} ticks={yTicks} />
-              <Tooltip content={<NoTooltip />} cursor={{ stroke: "#475569", strokeWidth: 1, strokeDasharray: "4 4" }} />
-              {[{ x: 2003, label: "Bloomberg" }, { x: 2015, label: "de Blasio" }, { x: 2023, label: "Adams" }]
-                .filter((r) => r.x >= startFY && r.x <= endFY)
-                .map((ref) => (
-                  <ReferenceLine key={ref.x} x={ref.x} stroke="rgba(148,163,184,0.15)" strokeDasharray="6 4" label={{ value: ref.label, position: "top", fill: "#475569", fontSize: 10, fontFamily: mono }} />
-                ))}
-              <Area type="monotone" dataKey="budget" stroke={chartColor} strokeWidth={2.5} fill="url(#budgetGradient)" dot={<CustomDot />} activeDot={<ActiveDot />} />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* ═══ CHART 2 ═══ */}
-        <div style={{ marginTop: "40px" }}>
-          <h2 style={{ fontFamily: serif, fontSize: "20px", color: "#E2E8F0", fontWeight: 600, margin: "0 0 4px 0" }}>Year-over-Year Change</h2>
-          <p style={{ fontSize: "13px", color: "#64748B", margin: "0 0 6px 0" }}>Percentage increase (or decrease) from the prior fiscal year's adopted expense budget</p>
-        </div>
-        <div style={{ background: lockedPct ? "rgba(15,23,42,0.95)" : "rgba(15,23,42,0.8)", border: `1px solid ${lockedPct ? "rgba(96,165,250,0.3)" : "rgba(51,65,85,0.4)"}`, borderRadius: "10px", padding: "12px 18px", marginBottom: "6px", minHeight: "58px", transition: "border-color 0.2s, background 0.2s" }}>
-          <DetailPanel data={displayPct} label="pct" locked={!!lockedPct} onUnlock={() => setLockedPct(null)} />
-        </div>
-        <div style={{ background: "rgba(15,23,42,0.6)", border: "1px solid rgba(51,65,85,0.4)", borderRadius: "14px", padding: "24px 12px 16px 0", cursor: "crosshair" }}
-          onMouseLeave={() => { if (!lockedPct) setHoveredPct(null); }}>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={pctData} margin={{ top: 16, right: 24, left: 16, bottom: 8 }} onMouseMove={lockedPct ? undefined : handlePctHover} onClick={handlePctClick}>
-              <CartesianGrid stroke="rgba(51,65,85,0.3)" strokeDasharray="3 3" vertical={false} />
-              <XAxis dataKey="fy" stroke="#334155" tick={{ fill: "#64748B", fontSize: 11, fontFamily: mono }} tickLine={false} axisLine={{ stroke: "#334155" }} tickFormatter={(v) => `'${String(v).slice(2)}`} interval={Math.max(1, Math.floor(pctData.length / 14))} />
-              <YAxis stroke="#334155" tick={{ fill: "#64748B", fontSize: 11, fontFamily: mono }} tickLine={false} axisLine={false} tickFormatter={(v) => `${v}%`} domain={[Math.floor(pctMin) - 1, Math.ceil(pctMax) + 1]} />
-              <Tooltip content={<NoTooltip />} cursor={{ fill: "rgba(148,163,184,0.06)" }} />
-              <ReferenceLine y={parseFloat(avgGrowthNum.toFixed(1))} stroke="#60A5FA" strokeDasharray="6 3" strokeWidth={1.5} label={{ value: `Avg ${fmtSign(avgGrowthNum.toFixed(1))}`, position: "right", fill: "#60A5FA", fontSize: 10, fontFamily: mono }} />
-              <ReferenceLine y={0} stroke="#475569" strokeWidth={1} />
-              {[{ x: 2003 }, { x: 2015 }, { x: 2023 }]
-                .filter((r) => r.x > startFY && r.x <= endFY)
-                .map((ref) => (
-                  <ReferenceLine key={ref.x} x={ref.x} stroke="rgba(148,163,184,0.12)" strokeDasharray="6 4" />
-                ))}
-              <Bar dataKey="pctChange" radius={[4, 4, 0, 0]} maxBarSize={28}>
-                {pctData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.pctChange < 0 ? "#F87171" : entry.pctChange > 7 ? "#34D399" : entry.pctChange > 4 ? "#D97706" : "#64748B"} fillOpacity={0.8} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-          <div style={{ display: "flex", gap: "16px", justifyContent: "center", marginTop: "8px", flexWrap: "wrap" }}>
-            {[
-              { color: "#F87171", label: "Decrease" },
-              { color: "#64748B", label: "0\u20134%" },
-              { color: "#D97706", label: "4\u20137%" },
-              { color: "#34D399", label: "> 7%" },
-              { color: "#60A5FA", label: "Average", dashed: true },
-            ].map((l) => (
-              <div key={l.label} style={{ display: "flex", alignItems: "center", gap: "6px", fontFamily: mono, fontSize: "10px", color: "#64748B" }}>
-                {l.dashed ? (<div style={{ width: 16, height: 0, borderTop: `2px dashed ${l.color}` }} />) : (<div style={{ width: 10, height: 10, borderRadius: "2px", background: l.color, opacity: 0.8 }} />)}
-                {l.label}
-              </div>
-            ))}
+        {/* ═══ CHART 1: Total Adopted Budget ═══ */}
+        <div ref={chart1Ref} style={{ position: "relative", background: "rgba(15,23,42,0.4)", border: "1px solid rgba(51,65,85,0.4)", borderRadius: "14px", padding: "24px", marginBottom: "40px" }}>
+          <ShareMenu chartRef={chart1Ref} chartId="nyc-total-budget-2002-2026" title="NYC Total Adopted Budget FY2002–2026" dark />
+          <h2 style={{ fontFamily: serif, fontSize: "20px", color: "#E2E8F0", fontWeight: 600, margin: "0 0 6px 0" }}>Total Adopted Budget</h2>
+          <div style={{ background: lockedBudget ? "rgba(15,23,42,0.95)" : "rgba(15,23,42,0.8)", border: `1px solid ${lockedBudget ? "rgba(96,165,250,0.3)" : "rgba(51,65,85,0.4)"}`, borderRadius: "10px", padding: "12px 18px", marginBottom: "6px", minHeight: "58px", transition: "border-color 0.2s, background 0.2s" }}>
+            <DetailPanel data={displayBudget} label="budget" locked={!!lockedBudget} onUnlock={() => setLockedBudget(null)} />
+          </div>
+          <div style={{ background: "rgba(15,23,42,0.6)", border: "1px solid rgba(51,65,85,0.4)", borderRadius: "14px", padding: "24px 12px 16px 0", cursor: "crosshair" }}
+            onMouseLeave={() => { if (!lockedBudget) setHoveredBudget(null); }}>
+            <ResponsiveContainer width="100%" height={380}>
+              <AreaChart data={budgetData} margin={{ top: 16, right: 24, left: 16, bottom: 8 }} onMouseMove={lockedBudget ? undefined : handleBudgetHover} onClick={handleBudgetClick}>
+                <defs>
+                  <linearGradient id="budgetGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor={chartColor} stopOpacity={0.25} />
+                    <stop offset="50%" stopColor={chartColor} stopOpacity={0.08} />
+                    <stop offset="100%" stopColor={chartColor} stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid stroke="rgba(51,65,85,0.3)" strokeDasharray="3 3" vertical={false} />
+                <XAxis dataKey="fy" stroke="#334155" tick={{ fill: "#64748B", fontSize: 11, fontFamily: mono }} tickLine={false} axisLine={{ stroke: "#334155" }} tickFormatter={(v) => `'${String(v).slice(2)}`} interval={Math.max(1, Math.floor(budgetData.length / 14))} />
+                <YAxis stroke="#334155" tick={{ fill: "#64748B", fontSize: 11, fontFamily: mono }} tickLine={false} axisLine={false} tickFormatter={(v) => `$${v}B`} domain={[yMin, yMax]} ticks={yTicks} />
+                <Tooltip content={<NoTooltip />} cursor={{ stroke: "#475569", strokeWidth: 1, strokeDasharray: "4 4" }} />
+                {[{ x: 2003, label: "Bloomberg" }, { x: 2015, label: "de Blasio" }, { x: 2023, label: "Adams" }]
+                  .filter((r) => r.x >= startFY && r.x <= endFY)
+                  .map((ref) => (
+                    <ReferenceLine key={ref.x} x={ref.x} stroke="rgba(148,163,184,0.15)" strokeDasharray="6 4" label={{ value: ref.label, position: "top", fill: "#475569", fontSize: 10, fontFamily: mono }} />
+                  ))}
+                <Area type="monotone" dataKey="budget" stroke={chartColor} strokeWidth={2.5} fill="url(#budgetGradient)" dot={<CustomDot />} activeDot={<ActiveDot />} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+          <div style={{ marginTop: "16px", paddingTop: "12px", borderTop: "1px solid rgba(51,65,85,0.3)", fontSize: "11px", color: "#475569", lineHeight: 1.6, fontFamily: mono }}>
+            <strong style={{ color: "#64748B" }}>Sources:</strong> NYC Mayor&rsquo;s Office of Management &amp; Budget (OMB) Expense, Revenue, Contract Budget reports. All source PDFs linked per data point via the detail panel above the chart. Figures represent total adopted expense budget including all funds (city, state, and federal). FY = Fiscal Year (July 1 &ndash; June 30). Click any data point to freeze the panel and access the source link.
           </div>
         </div>
 
-        {/* Source note */}
-        <div style={{ marginTop: "24px", paddingTop: "16px", borderTop: "1px solid rgba(51,65,85,0.3)", fontSize: "11px", color: "#475569", lineHeight: 1.6, fontFamily: mono }}>
-          <strong style={{ color: "#64748B" }}>Sources:</strong> NYC Mayor's Office of Management &amp; Budget (OMB) Expense, Revenue, Contract Budget reports. All source PDFs linked per data point via the detail panel above each chart. Figures represent total adopted expense budget including all funds (city, state, and federal). FY = Fiscal Year (July 1 &ndash; June 30). Click any data point to freeze the panel and access the source link.
+        {/* ═══ CHART 2: Year-over-Year Change ═══ */}
+        <div ref={chart2Ref} style={{ position: "relative", background: "rgba(15,23,42,0.4)", border: "1px solid rgba(51,65,85,0.4)", borderRadius: "14px", padding: "24px" }}>
+          <ShareMenu chartRef={chart2Ref} chartId="nyc-budget-yoy-change-2002-2026" title="NYC Budget Year-over-Year Change FY2002–2026" dark />
+          <h2 style={{ fontFamily: serif, fontSize: "20px", color: "#E2E8F0", fontWeight: 600, margin: "0 0 4px 0" }}>Year-over-Year Change</h2>
+          <p style={{ fontSize: "13px", color: "#64748B", margin: "0 0 6px 0" }}>Percentage increase (or decrease) from the prior fiscal year&rsquo;s adopted expense budget</p>
+          <div style={{ background: lockedPct ? "rgba(15,23,42,0.95)" : "rgba(15,23,42,0.8)", border: `1px solid ${lockedPct ? "rgba(96,165,250,0.3)" : "rgba(51,65,85,0.4)"}`, borderRadius: "10px", padding: "12px 18px", marginBottom: "6px", minHeight: "58px", transition: "border-color 0.2s, background 0.2s" }}>
+            <DetailPanel data={displayPct} label="pct" locked={!!lockedPct} onUnlock={() => setLockedPct(null)} />
+          </div>
+          <div style={{ background: "rgba(15,23,42,0.6)", border: "1px solid rgba(51,65,85,0.4)", borderRadius: "14px", padding: "24px 12px 16px 0", cursor: "crosshair" }}
+            onMouseLeave={() => { if (!lockedPct) setHoveredPct(null); }}>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={pctData} margin={{ top: 16, right: 24, left: 16, bottom: 8 }} onMouseMove={lockedPct ? undefined : handlePctHover} onClick={handlePctClick}>
+                <CartesianGrid stroke="rgba(51,65,85,0.3)" strokeDasharray="3 3" vertical={false} />
+                <XAxis dataKey="fy" stroke="#334155" tick={{ fill: "#64748B", fontSize: 11, fontFamily: mono }} tickLine={false} axisLine={{ stroke: "#334155" }} tickFormatter={(v) => `'${String(v).slice(2)}`} interval={Math.max(1, Math.floor(pctData.length / 14))} />
+                <YAxis stroke="#334155" tick={{ fill: "#64748B", fontSize: 11, fontFamily: mono }} tickLine={false} axisLine={false} tickFormatter={(v) => `${v}%`} domain={[Math.floor(pctMin) - 1, Math.ceil(pctMax) + 1]} />
+                <Tooltip content={<NoTooltip />} cursor={{ fill: "rgba(148,163,184,0.06)" }} />
+                <ReferenceLine y={parseFloat(avgGrowthNum.toFixed(1))} stroke="#60A5FA" strokeDasharray="6 3" strokeWidth={1.5} label={{ value: `Avg ${fmtSign(avgGrowthNum.toFixed(1))}`, position: "right", fill: "#60A5FA", fontSize: 10, fontFamily: mono }} />
+                <ReferenceLine y={0} stroke="#475569" strokeWidth={1} />
+                {[{ x: 2003 }, { x: 2015 }, { x: 2023 }]
+                  .filter((r) => r.x > startFY && r.x <= endFY)
+                  .map((ref) => (
+                    <ReferenceLine key={ref.x} x={ref.x} stroke="rgba(148,163,184,0.12)" strokeDasharray="6 4" />
+                  ))}
+                <Bar dataKey="pctChange" radius={[4, 4, 0, 0]} maxBarSize={28}>
+                  {pctData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.pctChange < 0 ? "#F87171" : entry.pctChange > 7 ? "#34D399" : entry.pctChange > 4 ? "#D97706" : "#64748B"} fillOpacity={0.8} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+            <div style={{ display: "flex", gap: "16px", justifyContent: "center", marginTop: "8px", flexWrap: "wrap" }}>
+              {[
+                { color: "#F87171", label: "Decrease" },
+                { color: "#64748B", label: "0\u20134%" },
+                { color: "#D97706", label: "4\u20137%" },
+                { color: "#34D399", label: "> 7%" },
+                { color: "#60A5FA", label: "Average", dashed: true },
+              ].map((l) => (
+                <div key={l.label} style={{ display: "flex", alignItems: "center", gap: "6px", fontFamily: mono, fontSize: "10px", color: "#64748B" }}>
+                  {l.dashed ? (<div style={{ width: 16, height: 0, borderTop: `2px dashed ${l.color}` }} />) : (<div style={{ width: 10, height: 10, borderRadius: "2px", background: l.color, opacity: 0.8 }} />)}
+                  {l.label}
+                </div>
+              ))}
+            </div>
+          </div>
+          <div style={{ marginTop: "16px", paddingTop: "12px", borderTop: "1px solid rgba(51,65,85,0.3)", fontSize: "11px", color: "#475569", lineHeight: 1.6, fontFamily: mono }}>
+            <strong style={{ color: "#64748B" }}>Sources:</strong> NYC Mayor&rsquo;s Office of Management &amp; Budget (OMB) Expense, Revenue, Contract Budget reports. All source PDFs linked per data point via the detail panel above the chart. Figures represent total adopted expense budget including all funds (city, state, and federal). FY = Fiscal Year (July 1 &ndash; June 30). Click any data point to freeze the panel and access the source link.
+          </div>
         </div>
       </div>
     </div>
