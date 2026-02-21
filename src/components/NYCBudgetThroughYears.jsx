@@ -249,6 +249,9 @@ export default function NYCBudgetChart() {
   const rangeData = allBudgetData.filter((d) => d.fy > startFY && d.fy <= endFY && d.pctChange !== null);
   const avgGrowthNum = rangeData.length > 0 ? rangeData.reduce((s, d) => s + d.pctChange, 0) / rangeData.length : 0;
 
+  const inflationRange = allBudgetData.filter((d) => d.fy > startFY && d.fy <= endFY && d.inflationPct != null);
+  const avgInflationNum = inflationRange.length > 0 ? inflationRange.reduce((s, d) => s + d.inflationPct, 0) / inflationRange.length : 0;
+
   const budgetData = allBudgetData.filter((d) => d.fy >= startFY && d.fy <= endFY);
   const pctData = budgetData.filter((d) => d.pctChange !== null);
 
@@ -429,6 +432,13 @@ export default function NYCBudgetChart() {
             <div style={{ fontFamily: serif, fontSize: "22px", fontWeight: 700, color: avgGrowthNum >= 0 ? "#60A5FA" : "#F87171", lineHeight: 1.2 }}>{fmtSign(avgGrowthNum.toFixed(1))}</div>
             <div style={{ fontSize: "11px", color: "#475569", marginTop: "2px" }}>Mean YoY change</div>
           </div>
+          {showInflation && (
+            <div style={{ background: "rgba(56,189,248,0.06)", border: "1px solid rgba(56,189,248,0.25)", borderRadius: "10px", padding: "14px 18px", flex: "1 1 150px", minWidth: "150px", display: "flex", flexDirection: "column", justifyContent: "center", transition: "all 0.3s" }}>
+              <div style={{ fontFamily: mono, fontSize: "9px", color: "#38BDF8", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "4px" }}>Avg Inflation Rate</div>
+              <div style={{ fontFamily: serif, fontSize: "22px", fontWeight: 700, color: "#38BDF8", lineHeight: 1.2 }}>{fmtSign(avgInflationNum.toFixed(1))}</div>
+              <div style={{ fontSize: "11px", color: "#475569", marginTop: "2px" }}>CPI-U, NYC Metro</div>
+            </div>
+          )}
         </div>
         </div>
 
