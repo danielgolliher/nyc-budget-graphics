@@ -2,7 +2,7 @@ import { useState, useCallback, useRef } from "react";
 import html2canvas from "html2canvas";
 import ShareMenu from "./ShareMenu";
 import {
-  AreaChart,
+  ComposedChart,
   Area,
   BarChart,
   Bar,
@@ -44,12 +44,22 @@ const rawData = [
   { fy: 2026, raw: 115907309727, mayor: "Adams", source: "https://www.nyc.gov/assets/omb/downloads/pdf/adopt25/erc6-25.pdf", sourceLabel: "OMB FY25 Adopted" },
 ];
 
+/* ─── INFLATION DATA (NYC Metro CPI-U, BLS Series CUURS12ASA0) ─── */
+const inflationData = {
+  2002: 2.18, 2003: 2.91, 2004: 3.29, 2005: 3.67, 2006: 4.04,
+  2007: 3.12, 2008: 3.38, 2009: 2.28, 2010: 1.12, 2011: 1.91,
+  2012: 2.78, 2013: 1.75, 2014: 1.55, 2015: 0.48, 2016: 0.58,
+  2017: 1.76, 2018: 1.78, 2019: 1.77, 2020: 1.77, 2021: 2.06,
+  2022: 5.05, 2023: 5.29, 2024: 3.43, 2025: 3.90,
+};
+
 const allBudgetData = rawData.map((d, i, arr) => {
   const budget = d.raw / 1e9; // convert to billions
   const prevRaw = i > 0 ? arr[i - 1].raw : null;
   const pctChange = prevRaw !== null ? parseFloat((((d.raw - prevRaw) / prevRaw) * 100).toFixed(1)) : null;
   const dollarChange = prevRaw !== null ? ((d.raw - prevRaw) / 1e9).toFixed(2) : null;
-  return { ...d, budget, pctChange, dollarChange };
+  const inflationPct = inflationData[d.fy] ?? null;
+  return { ...d, budget, pctChange, dollarChange, inflationPct };
 });
 
 const mayorColors = {
@@ -206,6 +216,7 @@ export default function NYCBudgetChart() {
   const [hoveredPct, setHoveredPct] = useState(null);
   const [lockedBudget, setLockedBudget] = useState(null);
   const [lockedPct, setLockedPct] = useState(null);
+  const [showInflation, setShowInflation] = useState(false);
 
   const chart1Ref = useRef(null);
   const chart2Ref = useRef(null);
@@ -424,14 +435,30 @@ export default function NYCBudgetChart() {
         {/* ═══ CHART 1: Total Adopted Budget ═══ */}
         <div ref={chart1Ref} style={{ position: "relative", background: "rgba(15,23,42,0.4)", border: "1px solid rgba(51,65,85,0.4)", borderRadius: "14px", padding: "24px", marginBottom: "40px" }}>
           <ShareMenu chartRef={chart1Ref} chartId="nyc-total-budget-2002-2026" title="NYC Total Adopted Budget FY2002–2026" dark onDownload={handleDownloadChart1} />
-          <h2 style={{ fontFamily: serif, fontSize: "20px", color: "#E2E8F0", fontWeight: 600, margin: "0 0 6px 0" }}>Total Adopted Budget</h2>
+          <div style={{ display: "flex", alignItems: "center", gap: "16px", margin: "0 0 6px 0", flexWrap: "wrap" }}>
+            <h2 style={{ fontFamily: serif, fontSize: "20px", color: "#E2E8F0", fontWeight: 600, margin: 0 }}>Total Adopted Budget</h2>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginLeft: "auto", position: "relative" }}>
+              {!showInflation && (
+                <div style={{ position: "absolute", right: "100%", marginRight: "12px", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: "6px", animation: "inflationPulse 2s ease-in-out infinite", pointerEvents: "none" }}>
+                  <span style={{ fontFamily: mono, fontSize: "11px", fontWeight: 600, color: "#38BDF8", background: "rgba(56,189,248,0.1)", border: "1px solid rgba(56,189,248,0.25)", borderRadius: "6px", padding: "4px 10px" }}>Overlay FY inflation rates!</span>
+                  <span style={{ color: "#38BDF8", fontSize: "14px" }}>&rarr;</span>
+                </div>
+              )}
+              <style>{`@keyframes inflationPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }`}</style>
+              <span style={{ fontFamily: mono, fontSize: "10px", color: showInflation ? "#38BDF8" : "#536178", letterSpacing: "0.08em", textTransform: "uppercase", transition: "color 0.2s", userSelect: "none" }}>Show Inflation</span>
+              <button onClick={() => setShowInflation(!showInflation)} aria-label="Toggle inflation overlay"
+                style={{ width: "38px", height: "22px", borderRadius: "11px", background: showInflation ? "#38BDF8" : "#334155", border: "1px solid " + (showInflation ? "#38BDF8" : "#475569"), cursor: "pointer", position: "relative", transition: "all 0.2s", padding: 0, flexShrink: 0 }}>
+                <div style={{ width: "16px", height: "16px", borderRadius: "50%", background: "#F8FAFC", position: "absolute", top: "2px", left: showInflation ? "18px" : "2px", transition: "left 0.2s", boxShadow: "0 1px 3px rgba(0,0,0,0.3)" }} />
+              </button>
+            </div>
+          </div>
           <div data-detail-panel style={{ background: lockedBudget ? "rgba(15,23,42,0.95)" : "rgba(15,23,42,0.8)", border: `1px solid ${lockedBudget ? "rgba(96,165,250,0.3)" : "rgba(51,65,85,0.4)"}`, borderRadius: "10px", padding: "12px 18px", marginBottom: "6px", minHeight: "58px", transition: "border-color 0.2s, background 0.2s" }}>
             <DetailPanel data={displayBudget} label="budget" locked={!!lockedBudget} onUnlock={() => setLockedBudget(null)} />
           </div>
           <div style={{ background: "rgba(15,23,42,0.6)", border: "1px solid rgba(51,65,85,0.4)", borderRadius: "14px", padding: "24px 12px 16px 0", cursor: "crosshair" }}
             onMouseLeave={() => { if (!lockedBudget) setHoveredBudget(null); }}>
             <ResponsiveContainer width="100%" height={380}>
-              <AreaChart data={budgetData} margin={{ top: 16, right: 24, left: 16, bottom: 8 }} onMouseMove={lockedBudget ? undefined : handleBudgetHover} onClick={handleBudgetClick}>
+              <ComposedChart data={budgetData} margin={{ top: 16, right: showInflation ? 48 : 24, left: 16, bottom: 8 }} onMouseMove={lockedBudget ? undefined : handleBudgetHover} onClick={handleBudgetClick}>
                 <defs>
                   <linearGradient id="budgetGradient" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor={chartColor} stopOpacity={0.25} />
@@ -441,19 +468,38 @@ export default function NYCBudgetChart() {
                 </defs>
                 <CartesianGrid stroke="rgba(51,65,85,0.3)" strokeDasharray="3 3" vertical={false} />
                 <XAxis dataKey="fy" stroke="#334155" tick={{ fill: "#64748B", fontSize: 11, fontFamily: mono }} tickLine={false} axisLine={{ stroke: "#334155" }} tickFormatter={(v) => `'${String(v).slice(2)}`} interval={Math.max(1, Math.floor(budgetData.length / 14))} />
-                <YAxis stroke="#334155" tick={{ fill: "#64748B", fontSize: 11, fontFamily: mono }} tickLine={false} axisLine={false} tickFormatter={(v) => `$${v}B`} domain={[yMin, yMax]} ticks={yTicks} />
+                <YAxis yAxisId="left" stroke="#334155" tick={{ fill: "#64748B", fontSize: 11, fontFamily: mono }} tickLine={false} axisLine={false} tickFormatter={(v) => `$${v}B`} domain={[yMin, yMax]} ticks={yTicks} />
+                {showInflation && (
+                  <YAxis yAxisId="right" orientation="right" stroke="#334155" tick={{ fill: "#38BDF8", fontSize: 11, fontFamily: mono }} tickLine={false} axisLine={false} tickFormatter={(v) => `${v}%`} domain={[0, 7]} ticks={[0, 1, 2, 3, 4, 5, 6, 7]} />
+                )}
                 <Tooltip content={<NoTooltip />} cursor={{ stroke: "#475569", strokeWidth: 1, strokeDasharray: "4 4" }} />
                 {[{ x: 2003, label: "Bloomberg" }, { x: 2015, label: "de Blasio" }, { x: 2023, label: "Adams" }]
                   .filter((r) => r.x >= startFY && r.x <= endFY)
                   .map((ref) => (
-                    <ReferenceLine key={ref.x} x={ref.x} stroke="rgba(148,163,184,0.15)" strokeDasharray="6 4" label={{ value: ref.label, position: "top", fill: "#475569", fontSize: 10, fontFamily: mono }} />
+                    <ReferenceLine key={ref.x} x={ref.x} yAxisId="left" stroke="rgba(148,163,184,0.15)" strokeDasharray="6 4" label={{ value: ref.label, position: "top", fill: "#475569", fontSize: 10, fontFamily: mono }} />
                   ))}
-                <Area type="monotone" dataKey="budget" stroke={chartColor} strokeWidth={2.5} fill="url(#budgetGradient)" dot={<CustomDot />} activeDot={<ActiveDot />} />
-              </AreaChart>
+                {showInflation && (
+                  <Bar yAxisId="right" dataKey="inflationPct" fill="#38BDF8" fillOpacity={0.18} radius={[3, 3, 0, 0]} maxBarSize={24} isAnimationActive={false} />
+                )}
+                <Area yAxisId="left" type="monotone" dataKey="budget" stroke={chartColor} strokeWidth={2.5} fill="url(#budgetGradient)" dot={<CustomDot />} activeDot={<ActiveDot />} />
+              </ComposedChart>
             </ResponsiveContainer>
+            {showInflation && (
+              <div style={{ display: "flex", gap: "20px", justifyContent: "center", marginTop: "10px", flexWrap: "wrap" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", fontFamily: mono, fontSize: "10px", color: "#64748B" }}>
+                  <div style={{ width: 16, height: 3, background: chartColor, borderRadius: "2px" }} />
+                  Adopted budget (left axis)
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", fontFamily: mono, fontSize: "10px", color: "#64748B" }}>
+                  <div style={{ width: 10, height: 10, borderRadius: "2px", background: "#38BDF8", opacity: 0.3 }} />
+                  CPI inflation rate (right axis)
+                </div>
+              </div>
+            )}
           </div>
           <div style={{ marginTop: "16px", paddingTop: "12px", borderTop: "1px solid rgba(51,65,85,0.3)", fontSize: "11px", color: "#475569", lineHeight: 1.6, fontFamily: mono }}>
             <strong style={{ color: "#64748B" }}>Sources:</strong> NYC Mayor&rsquo;s Office of Management &amp; Budget (OMB) Expense, Revenue, Contract Budget reports. All source PDFs linked per data point via the detail panel above the chart. Figures represent total adopted expense budget including all funds (city, state, and federal). FY = Fiscal Year (July 1 &ndash; June 30). Click any data point to freeze the panel and access the source link.
+            <span> | <strong style={{ color: "#38BDF8" }}>Inflation:</strong> U.S. Bureau of Labor Statistics, CPI-U All Items, NYC Metro Area (1982-84=100), not seasonally adjusted. FY2026 data not yet available. <a href="/data/nyc_fy_inflation_data.csv" download style={{ color: "#38BDF8", textDecoration: "none", borderBottom: "1px solid rgba(56,189,248,0.3)" }}>Download inflation data (CSV)</a></span>
           </div>
         </div>
 
