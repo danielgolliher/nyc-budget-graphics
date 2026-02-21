@@ -18,6 +18,14 @@ const categories = [
     component: lazy(() => import('./pages/StateTrajectoryPage')),
   },
   {
+    slug: 'nyc-budget-2002-2026',
+    label: 'Budget Through the Years',
+    description:
+      'How NYC\'s total adopted expense budget has grown from FY2002 to FY2026, across three mayors.',
+    preview: 'previews/budget-through-years.svg',
+    component: lazy(() => import('./pages/BudgetThroughYearsPage')),
+  },
+  {
     slug: 'growth-chart',
     label: 'Growth Chart',
     description:
