@@ -288,22 +288,17 @@ export default function NYCBudgetChart() {
   const createCompositeDownload = useCallback(async (chartRef, chartId, lockedData) => {
     if (!chartRef.current || !headerRef.current) return;
     try {
-      // Capture current select values before cloning (cloneNode doesn't preserve selectedIndex)
-      const origSelects = headerRef.current.querySelectorAll("select");
-      const selectValues = Array.from(origSelects).map((sel) => ({
-        index: sel.selectedIndex,
-        text: sel.options[sel.selectedIndex]?.text || sel.value,
-      }));
-
       // Clone header and prepend to chart card
       const headerClone = headerRef.current.cloneNode(true);
       headerClone.style.marginBottom = "24px";
 
-      // Replace <select> elements with plain text spans showing current values
-      const clonedSelects = headerClone.querySelectorAll("select");
-      clonedSelects.forEach((sel, i) => {
+      // Replace <select> elements with plain text spans using React state values
+      // (cloneNode doesn't preserve selectedIndex on controlled React selects)
+      const fyLabels = [`FY ${startFY} (P. ${startFY - 1})`, `FY ${endFY} (P. ${endFY - 1})`];
+      const origSelects = headerRef.current.querySelectorAll("select");
+      headerClone.querySelectorAll("select").forEach((sel, i) => {
         const span = document.createElement("span");
-        span.textContent = selectValues[i]?.text || sel.value;
+        span.textContent = fyLabels[i];
         span.style.cssText = window.getComputedStyle(origSelects[i]).cssText;
         span.style.display = "inline-block";
         span.style.appearance = "none";
@@ -355,7 +350,7 @@ export default function NYCBudgetChart() {
     } catch (err) {
       console.error("Download failed:", err);
     }
-  }, [pageUrl]);
+  }, [pageUrl, startFY, endFY]);
 
   const handleDownloadChart1 = useCallback(() => {
     createCompositeDownload(chart1Ref, "nyc-total-budget-2002-2026", lockedBudget);
