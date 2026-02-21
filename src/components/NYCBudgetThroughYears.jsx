@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef } from "react";
+import html2canvas from "html2canvas";
 import ShareMenu from "./ShareMenu";
 import {
   AreaChart,
@@ -208,6 +209,7 @@ export default function NYCBudgetChart() {
 
   const chart1Ref = useRef(null);
   const chart2Ref = useRef(null);
+  const headerRef = useRef(null);
 
   const handleMayorSelect = (mayorName) => {
     if (mayorName === null || mayorName === selectedMayor) {
@@ -267,12 +269,87 @@ export default function NYCBudgetChart() {
 
   const chartColor = selectedMayor ? mayorColors[selectedMayor] : "#D97706";
 
+  const pageUrl = window.location.href;
+
+  const createCompositeDownload = useCallback(async (chartRef, chartId, lockedData) => {
+    if (!chartRef.current || !headerRef.current) return;
+    try {
+      // Clone header and prepend to chart card
+      const headerClone = headerRef.current.cloneNode(true);
+      headerClone.style.marginBottom = "24px";
+
+      // Replace <select> elements with plain text spans (html2canvas renders selects poorly)
+      headerClone.querySelectorAll("select").forEach((sel) => {
+        const span = document.createElement("span");
+        span.textContent = sel.options[sel.selectedIndex]?.text || sel.value;
+        span.style.cssText = window.getComputedStyle(sel).cssText;
+        span.style.display = "inline-block";
+        span.style.appearance = "none";
+        span.style.webkitAppearance = "none";
+        span.style.color = "#F8FAFC";
+        sel.parentNode.replaceChild(span, sel);
+      });
+
+      chartRef.current.insertBefore(headerClone, chartRef.current.firstChild);
+
+      // Hide empty detail panel if no locked data
+      const detailPanel = chartRef.current.querySelector("[data-detail-panel]");
+      if (detailPanel && !lockedData) detailPanel.style.display = "none";
+
+      const canvas = await html2canvas(chartRef.current, {
+        backgroundColor: "#0F172A",
+        scale: 2,
+        useCORS: true,
+        ignoreElements: (el) => el.classList.contains("share-menu-controls"),
+      });
+
+      // Restore DOM
+      chartRef.current.removeChild(headerClone);
+      if (detailPanel && !lockedData) detailPanel.style.display = "";
+
+      // Add credit bar
+      const creditH = 40;
+      const finalCanvas = document.createElement("canvas");
+      finalCanvas.width = canvas.width;
+      finalCanvas.height = canvas.height + creditH * 2;
+      const ctx = finalCanvas.getContext("2d");
+      ctx.drawImage(canvas, 0, 0);
+      ctx.fillStyle = "#BE5343";
+      ctx.fillRect(0, canvas.height, finalCanvas.width, creditH * 2);
+      ctx.fillStyle = "#FFFFFF";
+      ctx.font = `${13 * 2}px -apple-system, BlinkMacSystemFont, sans-serif`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(
+        `Source: Maximum New York | maximumnewyork.com | ${pageUrl}`,
+        finalCanvas.width / 2,
+        canvas.height + creditH,
+      );
+
+      const link = document.createElement("a");
+      link.download = `${chartId}.png`;
+      link.href = finalCanvas.toDataURL("image/png");
+      link.click();
+    } catch (err) {
+      console.error("Download failed:", err);
+    }
+  }, [pageUrl]);
+
+  const handleDownloadChart1 = useCallback(() => {
+    createCompositeDownload(chart1Ref, "nyc-total-budget-2002-2026", lockedBudget);
+  }, [createCompositeDownload, lockedBudget]);
+
+  const handleDownloadChart2 = useCallback(() => {
+    createCompositeDownload(chart2Ref, "nyc-budget-yoy-change-2002-2026", lockedPct);
+  }, [createCompositeDownload, lockedPct]);
+
   return (
     <div style={{ background: "linear-gradient(145deg, #0B1120 0%, #111827 50%, #0F172A 100%)", minHeight: "100vh", padding: "40px 24px", fontFamily: "'Segoe UI', system-ui, sans-serif", position: "relative", overflow: "hidden" }}>
       <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(circle at 1px 1px, rgba(148,163,184,0.04) 1px, transparent 0)", backgroundSize: "32px 32px", pointerEvents: "none" }} />
       <div style={{ maxWidth: "1100px", margin: "0 auto", position: "relative", zIndex: 1 }}>
 
-        {/* Header */}
+        {/* Header + Controls (captured for downloads) */}
+        <div ref={headerRef}>
         <div style={{ marginBottom: "36px" }}>
           <div style={{ fontFamily: mono, fontSize: "11px", color: "#D97706", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: "10px", fontWeight: 600 }}>
             Interactive Model | NYC&rsquo;s Budget from FY 2002 through 2026
@@ -342,12 +419,13 @@ export default function NYCBudgetChart() {
             <div style={{ fontSize: "11px", color: "#475569", marginTop: "2px" }}>Mean YoY change</div>
           </div>
         </div>
+        </div>
 
         {/* ═══ CHART 1: Total Adopted Budget ═══ */}
         <div ref={chart1Ref} style={{ position: "relative", background: "rgba(15,23,42,0.4)", border: "1px solid rgba(51,65,85,0.4)", borderRadius: "14px", padding: "24px", marginBottom: "40px" }}>
-          <ShareMenu chartRef={chart1Ref} chartId="nyc-total-budget-2002-2026" title="NYC Total Adopted Budget FY2002–2026" dark />
+          <ShareMenu chartRef={chart1Ref} chartId="nyc-total-budget-2002-2026" title="NYC Total Adopted Budget FY2002–2026" dark onDownload={handleDownloadChart1} />
           <h2 style={{ fontFamily: serif, fontSize: "20px", color: "#E2E8F0", fontWeight: 600, margin: "0 0 6px 0" }}>Total Adopted Budget</h2>
-          <div style={{ background: lockedBudget ? "rgba(15,23,42,0.95)" : "rgba(15,23,42,0.8)", border: `1px solid ${lockedBudget ? "rgba(96,165,250,0.3)" : "rgba(51,65,85,0.4)"}`, borderRadius: "10px", padding: "12px 18px", marginBottom: "6px", minHeight: "58px", transition: "border-color 0.2s, background 0.2s" }}>
+          <div data-detail-panel style={{ background: lockedBudget ? "rgba(15,23,42,0.95)" : "rgba(15,23,42,0.8)", border: `1px solid ${lockedBudget ? "rgba(96,165,250,0.3)" : "rgba(51,65,85,0.4)"}`, borderRadius: "10px", padding: "12px 18px", marginBottom: "6px", minHeight: "58px", transition: "border-color 0.2s, background 0.2s" }}>
             <DetailPanel data={displayBudget} label="budget" locked={!!lockedBudget} onUnlock={() => setLockedBudget(null)} />
           </div>
           <div style={{ background: "rgba(15,23,42,0.6)", border: "1px solid rgba(51,65,85,0.4)", borderRadius: "14px", padding: "24px 12px 16px 0", cursor: "crosshair" }}
@@ -381,10 +459,10 @@ export default function NYCBudgetChart() {
 
         {/* ═══ CHART 2: Year-over-Year Change ═══ */}
         <div ref={chart2Ref} style={{ position: "relative", background: "rgba(15,23,42,0.4)", border: "1px solid rgba(51,65,85,0.4)", borderRadius: "14px", padding: "24px" }}>
-          <ShareMenu chartRef={chart2Ref} chartId="nyc-budget-yoy-change-2002-2026" title="NYC Budget Year-over-Year Change FY2002–2026" dark />
+          <ShareMenu chartRef={chart2Ref} chartId="nyc-budget-yoy-change-2002-2026" title="NYC Budget Year-over-Year Change FY2002–2026" dark onDownload={handleDownloadChart2} />
           <h2 style={{ fontFamily: serif, fontSize: "20px", color: "#E2E8F0", fontWeight: 600, margin: "0 0 4px 0" }}>Year-over-Year Change</h2>
           <p style={{ fontSize: "13px", color: "#64748B", margin: "0 0 6px 0" }}>Percentage increase (or decrease) from the prior fiscal year&rsquo;s adopted expense budget</p>
-          <div style={{ background: lockedPct ? "rgba(15,23,42,0.95)" : "rgba(15,23,42,0.8)", border: `1px solid ${lockedPct ? "rgba(96,165,250,0.3)" : "rgba(51,65,85,0.4)"}`, borderRadius: "10px", padding: "12px 18px", marginBottom: "6px", minHeight: "58px", transition: "border-color 0.2s, background 0.2s" }}>
+          <div data-detail-panel style={{ background: lockedPct ? "rgba(15,23,42,0.95)" : "rgba(15,23,42,0.8)", border: `1px solid ${lockedPct ? "rgba(96,165,250,0.3)" : "rgba(51,65,85,0.4)"}`, borderRadius: "10px", padding: "12px 18px", marginBottom: "6px", minHeight: "58px", transition: "border-color 0.2s, background 0.2s" }}>
             <DetailPanel data={displayPct} label="pct" locked={!!lockedPct} onUnlock={() => setLockedPct(null)} />
           </div>
           <div style={{ background: "rgba(15,23,42,0.6)", border: "1px solid rgba(51,65,85,0.4)", borderRadius: "14px", padding: "24px 12px 16px 0", cursor: "crosshair" }}

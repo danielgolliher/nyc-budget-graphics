@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom'
 import { QRCodeSVG } from 'qrcode.react'
 import html2canvas from 'html2canvas'
 
-export default function ShareMenu({ chartRef, chartId, title, dark }) {
+export default function ShareMenu({ chartRef, chartId, title, dark, onDownload }) {
   const [copied, setCopied] = useState(false)
   const [showEmbed, setShowEmbed] = useState(false)
   const [embedCopied, setEmbedCopied] = useState(false)
@@ -77,7 +77,7 @@ export default function ShareMenu({ chartRef, chartId, title, dark }) {
         <button className="share-btn" onClick={handleCopyLink} title="Copy link">
           {copied ? '✓ Copied' : 'Link'}
         </button>
-        <button className="share-btn" onClick={handleDownload} title="Download as PNG">
+        <button className="share-btn" onClick={onDownload || handleDownload} title="Download as PNG">
           Download
         </button>
         <button className="share-btn" onClick={() => setShowEmbed(!showEmbed)} title="Get embed code">
