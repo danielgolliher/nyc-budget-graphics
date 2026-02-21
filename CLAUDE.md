@@ -48,11 +48,12 @@ This is the **Maximum New York Data Viz** site — a collection of interactive d
 | `src/App.jsx` | Route definitions for normal and embed modes |
 | `index.html` | Google Fonts (Source Serif 4, JetBrains Mono, DM Sans, IBM Plex Sans), analytics, SPA redirect script |
 | `public/CNAME` | Custom domain — **do not delete** or deploys will break the domain |
+| `public/data/nyc_fy_inflation_data.csv` | BLS CPI-U inflation data (FY2001–2025, NYC Metro Area) — downloadable source for inflation overlay |
 
 ### Current Visualizations
 1. **Expense Budget** (`/expense-budget`) — FY2026 + FY2027 pie charts, light cards
 2. **State Trajectory** (`/state-trajectory`) — Slope chart + sortable table, dark cards
-3. **Budget Through the Years** (`/nyc-budget-2002-2026`) — Total adopted expense budget FY2002–2026 across three mayors, with area chart and year-over-year bar chart as two independently shareable dark cards. Component imports ShareMenu directly (not via page wrapper).
+3. **Budget Through the Years** (`/nyc-budget-2002-2026`) — Total adopted expense budget FY2002–2026 across three mayors, with area chart and year-over-year bar chart as two independently shareable dark cards. Component imports ShareMenu directly (not via page wrapper). Features a "Show Inflation" toggle on the area chart that overlays NYC Metro CPI-U inflation rates (BLS data, FY2002–2025) as bars behind the budget line, with a right-side Y-axis for the percentage scale. Inflation source CSV downloadable from `public/data/nyc_fy_inflation_data.csv`. Uses `ComposedChart` from Recharts to mix Area and Bar on Chart 1; Chart 2 remains a standalone `BarChart`.
 4. **Growth Chart** (`/growth-chart`) — Compound growth calculator with configurable scenarios, dark card
 
 ### Design System
