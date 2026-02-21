@@ -288,15 +288,23 @@ export default function NYCBudgetChart() {
   const createCompositeDownload = useCallback(async (chartRef, chartId, lockedData) => {
     if (!chartRef.current || !headerRef.current) return;
     try {
+      // Capture current select values before cloning (cloneNode doesn't preserve selectedIndex)
+      const origSelects = headerRef.current.querySelectorAll("select");
+      const selectValues = Array.from(origSelects).map((sel) => ({
+        index: sel.selectedIndex,
+        text: sel.options[sel.selectedIndex]?.text || sel.value,
+      }));
+
       // Clone header and prepend to chart card
       const headerClone = headerRef.current.cloneNode(true);
       headerClone.style.marginBottom = "24px";
 
-      // Replace <select> elements with plain text spans (html2canvas renders selects poorly)
-      headerClone.querySelectorAll("select").forEach((sel) => {
+      // Replace <select> elements with plain text spans showing current values
+      const clonedSelects = headerClone.querySelectorAll("select");
+      clonedSelects.forEach((sel, i) => {
         const span = document.createElement("span");
-        span.textContent = sel.options[sel.selectedIndex]?.text || sel.value;
-        span.style.cssText = window.getComputedStyle(sel).cssText;
+        span.textContent = selectValues[i]?.text || sel.value;
+        span.style.cssText = window.getComputedStyle(origSelects[i]).cssText;
         span.style.display = "inline-block";
         span.style.appearance = "none";
         span.style.webkitAppearance = "none";
