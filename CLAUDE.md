@@ -52,7 +52,8 @@ This is the **Maximum New York Data Viz** site — a collection of interactive d
 ### Current Visualizations
 1. **Expense Budget** (`/expense-budget`) — FY2026 + FY2027 pie charts, light cards
 2. **State Trajectory** (`/state-trajectory`) — Slope chart + sortable table, dark cards
-3. **Growth Chart** (`/growth-chart`) — Compound growth calculator with configurable scenarios, dark card
+3. **Budget Through the Years** (`/nyc-budget-2002-2026`) — Total adopted expense budget FY2002–2026 across three mayors, with area chart and year-over-year bar chart as two independently shareable dark cards. Component imports ShareMenu directly (not via page wrapper).
+4. **Growth Chart** (`/growth-chart`) — Compound growth calculator with configurable scenarios, dark card
 
 ### Design System
 - **Brand color**: `#BE5343` (Maximum New York red) — set as `--color-accent` in CSS
