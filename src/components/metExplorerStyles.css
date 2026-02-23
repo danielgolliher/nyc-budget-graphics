@@ -1317,6 +1317,10 @@ body.met-overlay-open {
     width: 100%;
   }
 
+  .met-email-input {
+    font-size: 16px; /* prevents iOS Safari auto-zoom on focus */
+  }
+
   .met-detail-actions {
     flex-direction: column;
     align-items: stretch;
