@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="140" viewBox="0 0 200 140">
+  <rect width="200" height="140" rx="8" fill="#0a0e17"/>
+  <!-- Stacked horizontal bars representing agency payroll -->
+  <rect x="50" y="20" width="120" height="10" rx="2" fill="#457B9D"/>
+  <rect x="50" y="20" width="100" height="10" rx="0" fill="#457B9D"/>
+  <rect x="150" y="20" width="8" height="10" fill="#E63946"/>
+  <rect x="158" y="20" width="12" height="10" rx="2" fill="#2A9D8F"/>
+
+  <rect x="50" y="35" width="60" height="10" rx="0" fill="#457B9D"/>
+  <rect x="110" y="35" width="18" height="10" fill="#E63946"/>
+  <rect x="128" y="35" width="8" height="10" rx="2" fill="#2A9D8F"/>
+
+  <rect x="50" y="50" width="30" height="10" rx="0" fill="#457B9D"/>
+  <rect x="80" y="50" width="10" height="10" fill="#E63946"/>
+  <rect x="90" y="50" width="5" height="10" rx="2" fill="#2A9D8F"/>
+
+  <rect x="50" y="65" width="22" height="10" rx="0" fill="#457B9D"/>
+  <rect x="72" y="65" width="8" height="10" fill="#E63946"/>
+  <rect x="80" y="65" width="3" height="10" rx="2" fill="#2A9D8F"/>
+
+  <rect x="50" y="80" width="18" height="10" rx="0" fill="#457B9D"/>
+  <rect x="68" y="80" width="4" height="10" fill="#E63946"/>
+  <rect x="72" y="80" width="3" height="10" rx="2" fill="#2A9D8F"/>
+
+  <rect x="50" y="95" width="15" height="10" rx="0" fill="#457B9D"/>
+  <rect x="65" y="95" width="6" height="10" fill="#E63946"/>
+  <rect x="71" y="95" width="2" height="10" rx="2" fill="#2A9D8F"/>
+
+  <rect x="50" y="110" width="12" height="10" rx="0" fill="#457B9D"/>
+  <rect x="62" y="110" width="3" height="10" fill="#E63946"/>
+  <rect x="65" y="110" width="2" height="10" rx="2" fill="#2A9D8F"/>
+
+  <!-- Y-axis labels (simplified) -->
+  <rect x="8" y="21" width="36" height="8" rx="2" fill="rgba(255,255,255,0.08)"/>
+  <rect x="8" y="36" width="36" height="8" rx="2" fill="rgba(255,255,255,0.08)"/>
+  <rect x="8" y="51" width="36" height="8" rx="2" fill="rgba(255,255,255,0.08)"/>
+  <rect x="8" y="66" width="36" height="8" rx="2" fill="rgba(255,255,255,0.08)"/>
+  <rect x="8" y="81" width="36" height="8" rx="2" fill="rgba(255,255,255,0.08)"/>
+  <rect x="8" y="96" width="36" height="8" rx="2" fill="rgba(255,255,255,0.08)"/>
+  <rect x="8" y="111" width="36" height="8" rx="2" fill="rgba(255,255,255,0.08)"/>
+
+  <!-- Legend dots -->
+  <circle cx="60" cy="132" r="3" fill="#457B9D"/>
+  <circle cx="100" cy="132" r="3" fill="#E63946"/>
+  <circle cx="140" cy="132" r="3" fill="#2A9D8F"/>
+</svg>

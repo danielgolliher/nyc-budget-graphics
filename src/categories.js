@@ -33,6 +33,14 @@ const categories = [
     preview: 'previews/growth-chart.svg',
     component: lazy(() => import('./pages/GrowthChartPage')),
   },
+  {
+    slug: 'nyc-payroll-2025',
+    label: 'NYC Payroll FY2025',
+    description:
+      'Where New York City\'s $34.6 billion payroll goes — compensation breakdown across 550,000+ municipal employees.',
+    preview: 'previews/payroll.svg',
+    component: lazy(() => import('./pages/PayrollPage')),
+  },
 ]
 
 export default categories
