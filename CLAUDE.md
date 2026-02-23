@@ -42,19 +42,34 @@ This is the **Maximum New York Data Viz** site — a collection of interactive d
 | File | Purpose |
 |------|---------|
 | `src/categories.js` | Central registry of all visualizations — drives nav, routes, homepage grid, and embed routes |
-| `src/components/Layout.jsx` | Navbar (with mobile hamburger), footer (with QR code) |
+| `src/components/Layout.jsx` | Navbar (with mobile hamburger), footer (with QR code + X/LinkedIn social links) |
 | `src/components/ShareMenu.jsx` | Link/Download/Embed buttons + QR code per chart card |
 | `src/index.css` | All styles including navbar, cards, dark-card theme, embed wrapper, responsive/mobile |
 | `src/App.jsx` | Route definitions for normal and embed modes |
 | `index.html` | Google Fonts (Source Serif 4, JetBrains Mono, DM Sans, IBM Plex Sans), analytics, SPA redirect script |
 | `public/CNAME` | Custom domain — **do not delete** or deploys will break the domain |
 | `public/data/nyc_fy_inflation_data.csv` | BLS CPI-U inflation data (FY2001–2025, NYC Metro Area) — downloadable source for inflation overlay |
+| `src/data/nycPayroll2025.js` | FY2025 payroll data — agency totals (raw + filtered), OT by agency, top earners, salary distribution, summary stats |
+| `src/components/PayrollCharts.jsx` | 6 payroll chart components + PayrollStats + shared hooks (useSelection, SelectionBar, FilterBadge) |
 
 ### Current Visualizations
 1. **Expense Budget** (`/expense-budget`) — FY2026 + FY2027 pie charts, light cards
 2. **State Trajectory** (`/state-trajectory`) — Slope chart + sortable table, dark cards
 3. **Budget Through the Years** (`/nyc-budget-2002-2026`) — Total adopted expense budget FY2002–2026 across three mayors, with area chart and year-over-year bar chart as two independently shareable dark cards. Component imports ShareMenu directly (not via page wrapper). Features a "Show Inflation" toggle on the area chart that overlays NYC Metro CPI-U inflation rates (BLS data, FY2002–2025) as bars behind the budget line, with a right-side Y-axis for the percentage scale. When toggled, an "Avg Inflation Rate" stat box also appears in the stats row, dynamically computed for the selected FY range. Inflation source CSV downloadable from `public/data/nyc_fy_inflation_data.csv`. Uses `ComposedChart` from Recharts to mix Area and Bar on Chart 1; Chart 2 remains a standalone `BarChart`.
 4. **Growth Chart** (`/growth-chart`) — Compound growth calculator with configurable scenarios, dark card
+5. **NYC Payroll FY2025** (`/nyc-payroll-2025`) — Breakdown of NYC's $34.6B payroll across 550K+ municipal employees. Data sourced from NYC Open Data (dataset `k397-673e`) via Socrata API. Six dark-card charts on a single page:
+   - **Top 20 Agencies** — Stacked horizontal bars (regular + overtime + other pay) with legend linking to "other pay" explanation
+   - **Compensation Distribution** — Histogram with $10K bands, toggle to exclude under-$10K part-time/seasonal, dynamic median band highlight
+   - **Total Overtime by Agency** — Top 20 agencies by OT dollars, gradient red bars
+   - **Overtime as % of Regular Pay** — Agencies with >$5M OT, sorted by OT ratio
+   - **Top 25 OT Earners** — Individual employees, grouped bars (regular vs overtime)
+   - **Highest Base Salaries** — Top 25 by annual base salary, gradient gold bars
+   - All charts support **click-to-select-and-sum**: click bars to select multiple, summary panel shows combined stats at top of chart
+   - **Empire Center filter toggle** at page top: switches all charts between all employees (550,219) and >$0 total comp only (549,246), matching Empire Center methodology. Each chart shows a `FilterBadge` when active. Filtered data fetched from Socrata API and stored in `src/data/nycPayroll2025.js` alongside unfiltered data; agency processing uses shared `buildAgencyDatasets()` function to avoid duplication.
+   - **Chart navigation menu**: horizontal pill buttons that smooth-scroll to each section via element IDs
+   - **Data cleaning banner**: dismissible notice at top of page with last-updated date
+   - Source paragraph with links to NYC Open Data dataset, Socrata API docs, and Empire Center report; explains employee count discrepancy (973 records with ≤$0 comp)
+   - Key files: `src/data/nycPayroll2025.js` (all data + filtered variants), `src/components/PayrollCharts.jsx` (6 chart components + PayrollStats + shared utilities), `src/pages/PayrollPage.jsx` (page wrapper)
 
 ### Design System
 - **Brand color**: `#BE5343` (Maximum New York red) — set as `--color-accent` in CSS
