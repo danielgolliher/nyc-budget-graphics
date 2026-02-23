@@ -208,11 +208,15 @@ function CardSkeleton() {
 
 function DetailOverlay({ artwork, onClose, isFavorite, toggleFavorite }) {
   useEffect(() => {
+    const scrollY = window.scrollY
+    document.body.style.top = `-${scrollY}px`
     document.body.classList.add('met-overlay-open')
     const handleKey = (e) => { if (e.key === 'Escape') onClose() }
     window.addEventListener('keydown', handleKey)
     return () => {
       document.body.classList.remove('met-overlay-open')
+      document.body.style.top = ''
+      window.scrollTo(0, scrollY)
       window.removeEventListener('keydown', handleKey)
     }
   }, [onClose])
@@ -303,11 +307,15 @@ function FavoritesSidePanel({ favorites, onClose, onRemove, onSelect }) {
   const [sendError, setSendError] = useState(null)
 
   useEffect(() => {
+    const scrollY = window.scrollY
+    document.body.style.top = `-${scrollY}px`
     document.body.classList.add('met-overlay-open')
     const handleKey = (e) => { if (e.key === 'Escape') onClose() }
     window.addEventListener('keydown', handleKey)
     return () => {
       document.body.classList.remove('met-overlay-open')
+      document.body.style.top = ''
+      window.scrollTo(0, scrollY)
       window.removeEventListener('keydown', handleKey)
     }
   }, [onClose])
