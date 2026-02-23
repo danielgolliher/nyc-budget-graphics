@@ -273,6 +273,35 @@ a:hover {
   border-radius: 0 2px 2px 0;
 }
 
+/* ─── Pigeon Toggle ─── */
+.pigeon-toggle {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.7);
+  background: none;
+  border: 1.5px solid rgba(255,255,255,0.2);
+  padding: 5px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+  margin-left: 6px;
+}
+
+.pigeon-toggle:hover {
+  color: #FFFFFF;
+  border-color: rgba(255,255,255,0.45);
+  background: rgba(255,255,255,0.08);
+}
+
+.pigeon-toggle.active {
+  color: #FFFFFF;
+  border-color: rgba(255,255,255,0.5);
+  background: rgba(255,255,255,0.18);
+}
+
 /* Mobile overlay */
 .navbar-overlay {
   position: fixed;
@@ -1096,6 +1125,11 @@ a:hover {
     background: #FFFFFF;
     top: 8px;
     bottom: 8px;
+  }
+  .pigeon-toggle {
+    margin: 8px 24px 4px;
+    align-self: flex-start;
+    font-size: 14px;
   }
 
   /* Payroll: filter label mobile */

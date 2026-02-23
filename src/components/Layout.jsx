@@ -2,10 +2,12 @@ import { useState, useRef, useEffect } from 'react'
 import { NavLink, Link, useLocation } from 'react-router-dom'
 import { QRCodeSVG } from 'qrcode.react'
 import categories from '../categories'
+import PigeonOverlay from './PigeonOverlay'
 
 export default function Layout({ children }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const [dropdownOpen, setDropdownOpen] = useState(false)
+  const [pigeonsActive, setPigeonsActive] = useState(false)
   const location = useLocation()
   const pageUrl = `${window.location.origin}${location.pathname}`
   const dropdownRef = useRef(null)
@@ -91,6 +93,13 @@ export default function Layout({ children }) {
                 ))}
               </div>
             </div>
+            <button
+              className={`pigeon-toggle${pigeonsActive ? ' active' : ''}`}
+              onClick={() => setPigeonsActive((p) => !p)}
+              title={pigeonsActive ? 'Disable pigeons' : 'Release the pigeons'}
+            >
+              Pigeons
+            </button>
           </div>
         </div>
       </nav>
@@ -129,6 +138,7 @@ export default function Layout({ children }) {
           </div>
         </div>
       </footer>
+      <PigeonOverlay active={pigeonsActive} />
     </>
   )
 }
