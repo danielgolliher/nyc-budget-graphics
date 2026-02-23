@@ -63,7 +63,7 @@ function buildEmailHTML(favorites) {
                 Your Met Museum Favorites
               </h1>
               <div style="font-size: 14px; color: rgba(255,255,255,0.85);">
-                ${favorites.length} artwork${favorites.length === 1 ? '' : 's'} curated on Maximum New York Data Viz
+                ${favorites.length} artwork${favorites.length === 1 ? '' : 's'} curated on Maximum New York Data Viz & Art
               </div>
             </td>
           </tr>
@@ -154,7 +154,7 @@ export default {
       body: JSON.stringify({
         from: 'Met Explorer <favorites@data.maximumnewyork.com>',
         to: email,
-        subject: 'Your Met Museum Favorites — Maximum New York Data Viz',
+        subject: 'Your Met Museum Favorites — Maximum New York Data Viz & Art',
         html,
       }),
     })

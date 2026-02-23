@@ -1,7 +1,7 @@
-# Maximum New York Data Viz Site
+# Maximum New York Data Viz & Art Site
 
 ## Project Overview
-This is the **Maximum New York Data Viz** site — a collection of interactive data visualizations. It lives at **https://data.maximumnewyork.com** and is deployed to GitHub Pages from the `gh-pages` branch.
+This is the **Maximum New York Data Viz & Art** site — a collection of interactive data visualizations. It lives at **https://data.maximumnewyork.com** and is deployed to GitHub Pages from the `gh-pages` branch.
 
 - **Repo**: https://github.com/danielgolliher/nyc-budget-graphics
 - **Branch**: `main` (single branch workflow)
@@ -35,14 +35,14 @@ This is the **Maximum New York Data Viz** site — a collection of interactive d
    - `page-container` > `page-header` (title + subtitle) > `chart-card` (with `dark-card` class if dark theme)
    - Include `ShareMenu` with `chartRef`, `chartId`, `title`, and `dark` prop if dark card
 3. Create a preview SVG thumbnail in `public/previews/` (200×140, simplified visual)
-4. Add entry to `src/categories.js` with `slug`, `label`, `description`, `preview`, and lazy-loaded `component`
+4. Add entry to `src/categories.js` with `slug`, `label`, `description`, `preview`, and lazy-loaded `component`. Optionally add `navLabel` for a shorter name in the nav dropdown (falls back to `label`)
 5. Everything else (routing, nav links, embed routes, homepage card) is automatic from the categories array
 
 ### Key Files
 | File | Purpose |
 |------|---------|
-| `src/categories.js` | Central registry of all visualizations — drives nav, routes, homepage grid, and embed routes |
-| `src/components/Layout.jsx` | Navbar (with mobile hamburger), footer (with QR code + X/LinkedIn social links) |
+| `src/categories.js` | Central registry of all visualizations — drives nav, routes, homepage grid, and embed routes. Optional `navLabel` field for shorter dropdown names |
+| `src/components/Layout.jsx` | Navbar (with "MNY" monogram, "Explore" dropdown menu, mobile hamburger), footer (with QR code + X/LinkedIn social links) |
 | `src/components/ShareMenu.jsx` | Link/Download/Embed buttons + QR code per chart card |
 | `src/index.css` | All styles including navbar, cards, dark-card theme, embed wrapper, responsive/mobile |
 | `src/App.jsx` | Route definitions for normal and embed modes |
@@ -51,6 +51,9 @@ This is the **Maximum New York Data Viz** site — a collection of interactive d
 | `public/data/nyc_fy_inflation_data.csv` | BLS CPI-U inflation data (FY2001–2025, NYC Metro Area) — downloadable source for inflation overlay |
 | `src/data/nycPayroll2025.js` | FY2025 payroll data — agency totals (raw + filtered), OT by agency, top earners, salary distribution, summary stats |
 | `src/components/PayrollCharts.jsx` | 6 payroll chart components + PayrollStats + shared hooks (useSelection, SelectionBar, FilterBadge) |
+| `src/components/MetExplorer.jsx` | Met Museum Explorer — gallery, search, detail overlay, favorites system, email panel |
+| `src/components/metExplorerStyles.css` | All Met Explorer styles (warm cream/gold theme, cards, overlays, favorites panel, FAB) |
+| `email-worker/index.js` | Cloudflare Worker that sends favorites email via Resend API |
 
 ### Current Visualizations
 1. **Expense Budget** (`/expense-budget`) — FY2026 + FY2027 pie charts, light cards
@@ -73,10 +76,27 @@ This is the **Maximum New York Data Viz** site — a collection of interactive d
    - **Consolidated source line**: single source attribution at bottom of page (replaces per-chart source lines)
    - Source paragraph with links to NYC Open Data dataset, Socrata API docs, and Empire Center report; explains employee count discrepancy (973 records with ≤$0 comp)
    - Key files: `src/data/nycPayroll2025.js` (all data + filtered variants), `src/components/PayrollCharts.jsx` (6 chart components + PayrollStats + shared utilities), `src/pages/PayrollPage.jsx` (page wrapper)
+6. **Met Museum Explorer** (`/met-explorer`) — Interactive gallery for browsing 500,000+ artworks from The Met's open collection API (`collectionapi.metmuseum.org`). Warm cream/gold design theme distinct from other pages.
+   - **Hero image**: Featured artwork displayed as full-width banner with gradient overlay showing title, artist, and date. Click to open detail view.
+   - **Search**: Free-text search bar that queries the Met API. Results replace the gallery grid.
+   - **Department filters**: Horizontally scrollable chip buttons for 19 Met departments (American Decorative Arts, Egyptian Art, European Paintings, etc.). "All" shows everything.
+   - **Surprise Me**: Button that picks a random department and loads its artworks with shuffled results.
+   - **Gallery grid**: 4-column card grid (3 on tablet, 2 on mobile) with 3:4 aspect ratio image thumbnails, title, and artist. Lazy-loaded images, staggered fade-in animation. "Load More" button for infinite scroll (batches of 12).
+   - **Detail overlay**: Full artwork view with high-res image, metadata fields (department, medium, dimensions, classification, credit line, accession number), "View on Met Museum" link, and favorite/unfavorite button. Closes via ✕, Escape, or backdrop click. Body scroll lock.
+   - **Favorites system**: Session-only (no persistence). Uses `Map` keyed by `objectID` for O(1) lookup + insertion order.
+     - **Star buttons**: On gallery cards (top-right of image, visible on hover/always on mobile), hero image, and detail overlay. Gold filled when starred, outline when not. `e.stopPropagation()` prevents opening detail view.
+     - **Floating action button (FAB)**: Fixed bottom-right, gold circle with star icon + count badge. Appears when `favorites.size > 0`. Opens the side panel.
+     - **Favorites side panel**: Slides in from right (380px, full-width on mobile). Contains: header with count, amber session notice, scrollable list of favorited artworks (60×60 thumbnails, title, artist, remove button), and email form footer. Click artwork to open detail overlay. Escape/backdrop to close. Body scroll lock.
+     - **Email favorites**: User enters email and clicks "Send". POSTs to a **Cloudflare Worker** (`met-favorites-email.danielgolliher.workers.dev`) which sends a formatted HTML email via **Resend API** (from `favorites@data.maximumnewyork.com`). The email has a gold-branded header, artwork cards with thumbnails/titles/artists/dates/links, and an "Explore More Art" CTA linking back to the page. Shows sending/success/error states inline.
+   - **Tip banner**: Gold-bordered note at top of page explaining the star-and-email feature.
+   - **Data source**: Met Museum Open Access API (no API key required). Initial load uses 12 pre-verified European Paintings seed IDs, then background-fetches full department list for load-more. Object cache (`useRef(Map)`) prevents redundant fetches. `AbortController` cancels in-flight requests on navigation.
+   - **Design**: Warm cream background (`#FDFBF7`), gold accent (`#B8860B`), shimmer skeleton loaders, card hover lift. Self-contained styles in `metExplorerStyles.css` with CSS custom properties (`--met-gold`, `--met-cream`, etc.).
+   - **Email infrastructure**: Cloudflare Worker in `email-worker/` directory. Resend API key stored as Worker secret (`wrangler secret put RESEND_API_KEY`). CORS locked to `data.maximumnewyork.com` + localhost. Input validation (email format, 1–100 favorites). Deploy with `cd email-worker && npx wrangler deploy`.
+   - Key files: `src/components/MetExplorer.jsx` (all sub-components + main component), `src/components/metExplorerStyles.css` (styles), `src/pages/MetExplorerPage.jsx` (page wrapper), `email-worker/index.js` (Cloudflare Worker)
 
 ### Design System
 - **Brand color**: `#BE5343` (Maximum New York red) — set as `--color-accent` in CSS
-- **Navbar**: Gradient red background with shadow, mobile hamburger menu
+- **Navbar**: Glassmorphism (`rgba` background + `backdrop-filter: blur(8px)`), 64px height (`--nav-height`). "MNY" monogram pill (JetBrains Mono) next to brand name. "Explore" dropdown groups all visualization links — desktop: hover/click to open, white glass panel with fade-in animation, active page gets red left bar, trigger gets white underline when any child page is active. Closes on click-outside or Escape. Mobile: dropdown items display directly in slide-out (no extra tap), trigger becomes uppercase "EXPLORE" section header, chevron hidden. Mobile slide-out also uses glassmorphism.
 - **Dark cards**: `#0a0e17` background, used for State Trajectory and Growth Chart
 - **Light cards**: White background, used for Expense Budget
 - **Fonts**: Source Serif 4 (display), DM Sans (body), JetBrains Mono (mono), IBM Plex Sans (Growth Chart component)

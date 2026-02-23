@@ -5,7 +5,7 @@ export default function HomePage() {
   return (
     <div className="page-container">
       <div className="page-header">
-        <h1>Maximum New York Data Viz</h1>
+        <h1>Maximum New York Data Viz & Art</h1>
         <p className="subtitle">
           Created to support posts on the <a href="https://maximumnewyork.com" target="_blank" rel="noopener noreferrer">Maximum New York</a> site, and for general fun and interest.
         </p>

@@ -1,23 +1,49 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { NavLink, Link, useLocation } from 'react-router-dom'
 import { QRCodeSVG } from 'qrcode.react'
 import categories from '../categories'
 
 export default function Layout({ children }) {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [dropdownOpen, setDropdownOpen] = useState(false)
   const location = useLocation()
   const pageUrl = `${window.location.origin}${location.pathname}`
+  const dropdownRef = useRef(null)
 
-  const closeMenu = () => setMenuOpen(false)
+  const closeMenu = () => {
+    setMenuOpen(false)
+    setDropdownOpen(false)
+  }
+
+  const anyChildActive = categories.some(({ slug }) => location.pathname === '/' + slug)
+
+  // Close dropdown on click outside or Escape
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdownOpen(false)
+      }
+    }
+    const handleEscape = (e) => {
+      if (e.key === 'Escape') setDropdownOpen(false)
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    document.addEventListener('keydown', handleEscape)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('keydown', handleEscape)
+    }
+  }, [])
 
   return (
     <>
       <nav className="navbar">
         <div className="navbar-inner">
           <Link to="/" className="navbar-brand" onClick={closeMenu}>
+            <span className="brand-monogram">MNY</span>
             <span className="brand-name">Maximum New York</span>
             <span className="brand-rule" />
-            <span className="brand-sub">Data Viz</span>
+            <span className="brand-sub">Data Viz & Art</span>
           </Link>
 
           <button
@@ -31,19 +57,40 @@ export default function Layout({ children }) {
           </button>
 
           <div className={`navbar-links${menuOpen ? ' open' : ''}`}>
-            <NavLink to="/" className={({ isActive }) => (isActive ? 'active' : '')} end onClick={closeMenu}>
-              Home
-            </NavLink>
-            {categories.map(({ slug, label }) => (
-              <NavLink
-                key={slug}
-                to={`/${slug}`}
-                className={({ isActive }) => (isActive ? 'active' : '')}
-                onClick={closeMenu}
+            <div
+              className="nav-dropdown"
+              ref={dropdownRef}
+              onMouseEnter={() => setDropdownOpen(true)}
+              onMouseLeave={() => setDropdownOpen(false)}
+            >
+              <button
+                className={`nav-dropdown-trigger${anyChildActive ? ' active' : ''}`}
+                onClick={() => setDropdownOpen((o) => !o)}
               >
-                {label}
-              </NavLink>
-            ))}
+                Explore
+                <svg
+                  className={`dropdown-chevron${dropdownOpen ? ' open' : ''}`}
+                  width="10"
+                  height="6"
+                  viewBox="0 0 10 6"
+                  fill="none"
+                >
+                  <path d="M1 1l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+              <div className={`nav-dropdown-menu${dropdownOpen ? ' open' : ''}`}>
+                {categories.map(({ slug, label, navLabel }) => (
+                  <NavLink
+                    key={slug}
+                    to={`/${slug}`}
+                    className={({ isActive }) => `nav-dropdown-item${isActive ? ' active' : ''}`}
+                    onClick={closeMenu}
+                  >
+                    {navLabel || label}
+                  </NavLink>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </nav>

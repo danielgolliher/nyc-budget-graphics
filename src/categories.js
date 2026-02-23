@@ -20,6 +20,7 @@ const categories = [
   {
     slug: 'nyc-budget-2002-2026',
     label: 'Budget Through the Years',
+    navLabel: 'Budget History',
     description:
       'How NYC\'s total adopted expense budget has grown from FY2002 to FY2026, across three mayors.',
     preview: 'previews/budget-through-years.svg',
@@ -36,6 +37,7 @@ const categories = [
   {
     slug: 'nyc-payroll-2025',
     label: 'NYC Payroll FY2025',
+    navLabel: 'NYC Payroll',
     description:
       'Where New York City\'s $34.6 billion payroll goes — compensation breakdown across 550,000+ municipal employees.',
     preview: 'previews/payroll.svg',
@@ -44,6 +46,7 @@ const categories = [
   {
     slug: 'met-explorer',
     label: 'Met Museum Explorer',
+    navLabel: 'Met Explorer',
     description:
       "Discover and explore 500,000+ artworks from The Metropolitan Museum of Art's open collection.",
     preview: 'previews/met-explorer.svg',
