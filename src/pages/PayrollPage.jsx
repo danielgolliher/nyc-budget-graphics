@@ -38,7 +38,7 @@ export default function PayrollPage() {
         borderRadius: 8, textAlign: 'center',
         fontSize: 13, color: '#64748b', fontFamily: "'DM Sans', sans-serif",
       }}>
-        This data is still being cleaned, although final cleaning will likely only impact &lt;1000 employees.
+        This data is still being cleaned. Please recheck anything you find on the page if this banner is up.
         <br />[Last updated February 22, 2026]
       </div>
 
