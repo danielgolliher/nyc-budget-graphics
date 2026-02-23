@@ -7,7 +7,7 @@ export default function HomePage() {
       <div className="page-header">
         <h1>Maximum New York Data Viz & Art</h1>
         <p className="subtitle">
-          Created to support posts on the <a href="https://maximumnewyork.com" target="_blank" rel="noopener noreferrer">Maximum New York</a> site, and for general fun and interest.
+          Created to support posts on the <a href="https://maximumnewyork.com" target="_blank" rel="noopener noreferrer">Maximum New York</a> site, and for general fun and interest. Contact Daniel at <a href="mailto:daniel@maximumnewyork.com">daniel@maximumnewyork.com</a> with any questions or comments, or DM him on <a href="https://linkedin.com/in/danielgolliher" target="_blank" rel="noopener noreferrer">LinkedIn</a> or <a href="https://x.com/danielgolliher" target="_blank" rel="noopener noreferrer">X</a>.
         </p>
       </div>
 
