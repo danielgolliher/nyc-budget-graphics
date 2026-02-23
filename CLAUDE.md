@@ -65,9 +65,12 @@ This is the **Maximum New York Data Viz** site — a collection of interactive d
    - **Top 25 OT Earners** — Individual employees, grouped bars (regular vs overtime)
    - **Highest Base Salaries** — Top 25 by annual base salary, gradient gold bars
    - All charts support **click-to-select-and-sum**: click bars to select multiple, summary panel shows combined stats at top of chart
-   - **Empire Center filter toggle** at page top: switches all charts between all employees (550,219) and >$0 total comp only (549,246), matching Empire Center methodology. Each chart shows a `FilterBadge` when active. Filtered data fetched from Socrata API and stored in `src/data/nycPayroll2025.js` alongside unfiltered data; agency processing uses shared `buildAgencyDatasets()` function to avoid duplication.
-   - **Chart navigation menu**: horizontal pill buttons that smooth-scroll to each section via element IDs
-   - **Data cleaning banner**: dismissible notice at top of page with last-updated date
+   - **Empire Center filter toggle** at page top: switches all charts between all employees (550,219) and >$0 total comp only (549,246), matching Empire Center methodology. Each chart shows a `FilterBadge` when active (with shorter text on mobile). Toggling the filter clears all bar selections via key-prop remounting. Filtered data fetched from Socrata API and stored in `src/data/nycPayroll2025.js` alongside unfiltered data; agency processing uses shared `buildAgencyDatasets()` function to avoid duplication.
+   - **Sticky chart navigation**: pill buttons that smooth-scroll to each section, sticks below navbar on scroll (`position: sticky; top: var(--nav-height)`). Active section highlighted via `IntersectionObserver`. On mobile, pills scroll horizontally with hidden scrollbar.
+   - **Fiscal year selector**: disabled `<select>` with FY2025/2024/2023 options, grayed out with a pulsing "Coming Soon!" badge (`@keyframes comingSoonPulse`). Positioned above the filter toggle.
+   - **Data cleaning banner**: amber-styled notice at top of page with last-updated date
+   - **Mobile responsiveness**: filter toggle and FilterBadge use dual-span pattern (`.filter-label-full` / `.filter-label-short`) for shorter text on small screens. Mobile tap hint shown below nav pills. FY selector stacks vertically on mobile.
+   - **Consolidated source line**: single source attribution at bottom of page (replaces per-chart source lines)
    - Source paragraph with links to NYC Open Data dataset, Socrata API docs, and Empire Center report; explains employee count discrepancy (973 records with ≤$0 comp)
    - Key files: `src/data/nycPayroll2025.js` (all data + filtered variants), `src/components/PayrollCharts.jsx` (6 chart components + PayrollStats + shared utilities), `src/pages/PayrollPage.jsx` (page wrapper)
 
