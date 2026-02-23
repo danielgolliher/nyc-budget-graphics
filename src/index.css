@@ -470,6 +470,20 @@ a:hover {
   color: var(--color-text-secondary);
 }
 
+.footer-social {
+  display: flex;
+  gap: 12px;
+  margin-top: 6px;
+}
+.footer-social a {
+  color: var(--color-text-secondary);
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+.footer-social a:hover {
+  opacity: 1;
+}
+
 .footer-qr {
   flex-shrink: 0;
   line-height: 0;
