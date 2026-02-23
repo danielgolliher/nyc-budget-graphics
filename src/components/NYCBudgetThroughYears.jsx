@@ -129,9 +129,9 @@ const DetailPanel = ({ data, label, locked, onUnlock }) => {
   if (label === "pct") {
     if (d.pctChange === null) return null;
     return (
-      <div style={{ display: "flex", alignItems: "center", gap: "20px", height: "100%", flexWrap: "wrap", minHeight: "48px" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "12px 20px", height: "100%", flexWrap: "wrap", minHeight: "48px" }}>
         <div>
-          <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "4px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "4px", flexWrap: "wrap" }}>
             <span style={{ fontFamily: mono, fontSize: "11px", color: "#94A3B8", letterSpacing: "0.08em", textTransform: "uppercase" }}>FY {d.fy} <span style={{ color: "#536178", fontWeight: 400, fontSize: "10px", letterSpacing: "0.04em" }}>(Passed {d.fy - 1})</span> vs FY {d.fy - 1} <span style={{ color: "#536178", fontWeight: 400, fontSize: "10px", letterSpacing: "0.04em" }}>(Passed {d.fy - 2})</span></span>
             <span style={{ fontFamily: mono, fontSize: "10px", color: mayorColors[d.mayor], background: `${mayorColors[d.mayor]}18`, padding: "2px 8px", borderRadius: "4px", fontWeight: 600 }}>{d.mayor}</span>
           </div>
@@ -152,9 +152,9 @@ const DetailPanel = ({ data, label, locked, onUnlock }) => {
   }
 
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: "20px", height: "100%", flexWrap: "wrap", minHeight: "48px" }}>
+    <div style={{ display: "flex", alignItems: "center", gap: "12px 20px", height: "100%", flexWrap: "wrap", minHeight: "48px" }}>
       <div>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "4px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "4px", flexWrap: "wrap" }}>
           <span style={{ fontFamily: mono, fontSize: "11px", color: "#94A3B8", letterSpacing: "0.08em", textTransform: "uppercase" }}>FY {d.fy} <span style={{ color: "#536178", fontWeight: 400, fontSize: "10px", letterSpacing: "0.04em" }}>(Passed {d.fy - 1})</span></span>
           <span style={{ fontFamily: mono, fontSize: "10px", color: mayorColors[d.mayor], background: `${mayorColors[d.mayor]}18`, padding: "2px 8px", borderRadius: "4px", fontWeight: 600 }}>{d.mayor}</span>
         </div>
@@ -361,7 +361,7 @@ export default function NYCBudgetChart() {
   }, [createCompositeDownload, lockedPct]);
 
   return (
-    <div style={{ background: "linear-gradient(145deg, #0B1120 0%, #111827 50%, #0F172A 100%)", minHeight: "100vh", padding: "40px 24px", fontFamily: "'Segoe UI', system-ui, sans-serif", position: "relative", overflow: "hidden" }}>
+    <div style={{ background: "linear-gradient(145deg, #0B1120 0%, #111827 50%, #0F172A 100%)", minHeight: "100vh", padding: "clamp(16px, 4vw, 40px) clamp(12px, 3vw, 24px)", fontFamily: "'Segoe UI', system-ui, sans-serif", position: "relative", overflow: "hidden" }}>
       <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(circle at 1px 1px, rgba(148,163,184,0.04) 1px, transparent 0)", backgroundSize: "32px 32px", pointerEvents: "none" }} />
       <div style={{ maxWidth: "1100px", margin: "0 auto", position: "relative", zIndex: 1 }}>
 
@@ -446,13 +446,13 @@ export default function NYCBudgetChart() {
         </div>
 
         {/* ═══ CHART 1: Total Adopted Budget ═══ */}
-        <div ref={chart1Ref} style={{ position: "relative", background: "rgba(15,23,42,0.4)", border: "1px solid rgba(51,65,85,0.4)", borderRadius: "14px", padding: "24px", marginBottom: "40px" }}>
+        <div ref={chart1Ref} style={{ position: "relative", background: "rgba(15,23,42,0.4)", border: "1px solid rgba(51,65,85,0.4)", borderRadius: "14px", padding: "clamp(12px, 3vw, 24px)", marginBottom: "40px" }}>
           <ShareMenu chartRef={chart1Ref} chartId="nyc-total-budget-2002-2026" title="NYC Total Adopted Budget FY2002–2026" dark onDownload={handleDownloadChart1} />
           <div style={{ display: "flex", alignItems: "center", gap: "16px", margin: "0 0 6px 0", flexWrap: "wrap" }}>
             <h2 style={{ fontFamily: serif, fontSize: "20px", color: "#E2E8F0", fontWeight: 600, margin: 0 }}>Total Adopted Budget</h2>
             <div style={{ display: "flex", alignItems: "center", gap: "8px", marginLeft: "auto", position: "relative" }}>
               {!showInflation && (
-                <div style={{ position: "absolute", right: "100%", marginRight: "12px", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: "6px", animation: "inflationPulse 2s ease-in-out infinite", pointerEvents: "none" }}>
+                <div className="inflation-hint" style={{ position: "absolute", right: "100%", marginRight: "12px", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: "6px", animation: "inflationPulse 2s ease-in-out infinite", pointerEvents: "none" }}>
                   <span style={{ fontFamily: mono, fontSize: "11px", fontWeight: 600, color: "#38BDF8", background: "rgba(56,189,248,0.1)", border: "1px solid rgba(56,189,248,0.25)", borderRadius: "6px", padding: "4px 10px" }}>Overlay FY inflation rates!</span>
                   <span style={{ color: "#38BDF8", fontSize: "14px" }}>&rarr;</span>
                 </div>
@@ -517,7 +517,7 @@ export default function NYCBudgetChart() {
         </div>
 
         {/* ═══ CHART 2: Year-over-Year Change ═══ */}
-        <div ref={chart2Ref} style={{ position: "relative", background: "rgba(15,23,42,0.4)", border: "1px solid rgba(51,65,85,0.4)", borderRadius: "14px", padding: "24px" }}>
+        <div ref={chart2Ref} style={{ position: "relative", background: "rgba(15,23,42,0.4)", border: "1px solid rgba(51,65,85,0.4)", borderRadius: "14px", padding: "clamp(12px, 3vw, 24px)" }}>
           <ShareMenu chartRef={chart2Ref} chartId="nyc-budget-yoy-change-2002-2026" title="NYC Budget Year-over-Year Change FY2002–2026" dark onDownload={handleDownloadChart2} />
           <h2 style={{ fontFamily: serif, fontSize: "20px", color: "#E2E8F0", fontWeight: 600, margin: "0 0 4px 0" }}>Year-over-Year Change</h2>
           <p style={{ fontSize: "13px", color: "#64748B", margin: "0 0 6px 0" }}>Percentage increase (or decrease) from the prior fiscal year&rsquo;s adopted expense budget</p>

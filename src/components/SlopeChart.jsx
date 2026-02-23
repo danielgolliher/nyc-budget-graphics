@@ -10,13 +10,14 @@ export default function SlopeChart({ data, hoveredState, setHoveredState, active
     if (!el) return
     const ro = new ResizeObserver((entries) => {
       const w = entries[0].contentRect.width
-      setDims({ width: Math.max(400, w), height: 1100 })
+      setDims({ width: Math.max(320, w), height: 1100 })
     })
     ro.observe(el)
     return () => ro.disconnect()
   }, [])
 
-  const margin = { top: 50, bottom: 20, left: 150, right: 150 }
+  const sideMargin = dims.width < 500 ? 70 : dims.width < 700 ? 110 : 150
+  const margin = { top: 50, bottom: 20, left: sideMargin, right: sideMargin }
   const innerW = dims.width - margin.left - margin.right
   const innerH = dims.height - margin.top - margin.bottom
   const rowH = innerH / 50
@@ -25,6 +26,8 @@ export default function SlopeChart({ data, hoveredState, setHoveredState, active
   const x1 = margin.left
   const x2 = margin.left + innerW
 
+  const labelFontSize = dims.width < 500 ? 9 : 11
+  const headerFontSize = dims.width < 500 ? 12 : 15
   const getLineColor = (d) => categoryColorMap[d.category]
 
   const isHighlighted = (d) => {
@@ -85,11 +88,11 @@ export default function SlopeChart({ data, hoveredState, setHoveredState, active
       <svg ref={svgRef} width={dims.width} height={dims.height}
         style={{ display: 'block', margin: '0 auto' }}>
         <text x={x1} y={margin.top - 24} textAnchor="middle"
-          style={{ fontSize: 15, fontWeight: 700, fill: '#cbd5e1', fontFamily: "'JetBrains Mono', monospace", letterSpacing: '0.05em' }}>
+          style={{ fontSize: headerFontSize, fontWeight: 700, fill: '#cbd5e1', fontFamily: "'JetBrains Mono', monospace", letterSpacing: '0.05em' }}>
           1960
         </text>
         <text x={x2} y={margin.top - 24} textAnchor="middle"
-          style={{ fontSize: 15, fontWeight: 700, fill: '#cbd5e1', fontFamily: "'JetBrains Mono', monospace", letterSpacing: '0.05em' }}>
+          style={{ fontSize: headerFontSize, fontWeight: 700, fill: '#cbd5e1', fontFamily: "'JetBrains Mono', monospace", letterSpacing: '0.05em' }}>
           2024
         </text>
 
@@ -132,7 +135,7 @@ export default function SlopeChart({ data, hoveredState, setHoveredState, active
               <text x={x1 - 8} y={getY(d.rank1960) + 1}
                 textAnchor="end" dominantBaseline="middle"
                 style={{
-                  fontSize: 11, fontFamily: "'JetBrains Mono', monospace",
+                  fontSize: labelFontSize, fontFamily: "'JetBrains Mono', monospace",
                   fill: lit ? '#f8fafc' : '#94a3b8',
                   fontWeight: lit ? 700 : 400, opacity, transition: 'all 0.2s',
                 }}>
@@ -158,7 +161,7 @@ export default function SlopeChart({ data, hoveredState, setHoveredState, active
               <text x={x2 + 8} y={getY(d.rank2024) + 1}
                 textAnchor="start" dominantBaseline="middle"
                 style={{
-                  fontSize: 11, fontFamily: "'JetBrains Mono', monospace",
+                  fontSize: labelFontSize, fontFamily: "'JetBrains Mono', monospace",
                   fill: lit ? '#f8fafc' : '#94a3b8',
                   fontWeight: lit ? 700 : 400, opacity, transition: 'all 0.2s',
                 }}>

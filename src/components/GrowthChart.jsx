@@ -227,7 +227,7 @@ export default function GrowthChart() {
     borderRadius: 4,
     color: "#fff",
     padding: "6px 8px",
-    fontSize: 13,
+    fontSize: 16,
     fontFamily: "'JetBrains Mono', monospace",
     outline: "none",
     transition: "border-color 0.2s",
@@ -330,7 +330,8 @@ export default function GrowthChart() {
                 value={years}
                 onChange={(e) => setYears(parseInt(e.target.value))}
                 style={{
-                  width: 100,
+                  width: 120,
+                  maxWidth: "40vw",
                   accentColor: "#E63946",
                   cursor: "pointer",
                 }}
@@ -382,8 +383,8 @@ export default function GrowthChart() {
               border: "none",
               borderRadius: 4,
               color: "#fff",
-              padding: "8px 16px",
-              fontSize: 13,
+              padding: "10px 18px",
+              fontSize: 14,
               fontWeight: 500,
               cursor: "pointer",
               fontFamily: "'IBM Plex Sans', sans-serif",
@@ -588,6 +589,8 @@ export default function GrowthChart() {
                     alignItems: "baseline",
                     gap: 8,
                     fontFamily: "'JetBrains Mono', monospace",
+                    minWidth: 0,
+                    flexShrink: 1,
                   }}
                 >
                   <span style={{ fontSize: 12, color: "rgba(255,255,255,0.35)" }}>
@@ -618,9 +621,11 @@ export default function GrowthChart() {
                     borderRadius: 4,
                     color: "rgba(255,255,255,0.3)",
                     cursor: "pointer",
-                    padding: "2px 8px",
+                    padding: "6px 12px",
                     fontSize: 16,
                     lineHeight: 1,
+                    minWidth: 32,
+                    minHeight: 32,
                     transition: "all 0.2s",
                     flexShrink: 0,
                   }}
