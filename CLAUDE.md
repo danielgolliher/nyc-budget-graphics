@@ -42,7 +42,8 @@ This is the **Maximum New York Data Viz & Art** site — a collection of interac
 | File | Purpose |
 |------|---------|
 | `src/categories.js` | Central registry of all visualizations — drives nav, routes, homepage grid, and embed routes. Optional `navLabel` field for shorter dropdown names |
-| `src/components/Layout.jsx` | Navbar (with "MNY" monogram, "Explore" dropdown menu, mobile hamburger), footer (with QR code + X/LinkedIn social links) |
+| `src/components/Layout.jsx` | Navbar (with "MNY" monogram, "Explore" dropdown menu, "Pigeons" toggle, mobile hamburger), footer (with QR code + X/LinkedIn social links) |
+| `src/components/PigeonOverlay.jsx` | Site-wide 2D canvas pigeon particle effect — ~28 pigeons + drifting feathers, toggled from navbar |
 | `src/components/ShareMenu.jsx` | Link/Download/Embed buttons + QR code per chart card |
 | `src/index.css` | All styles including navbar, cards, dark-card theme, embed wrapper, responsive/mobile |
 | `src/App.jsx` | Route definitions for normal and embed modes |
@@ -98,7 +99,7 @@ This is the **Maximum New York Data Viz & Art** site — a collection of interac
 
 ### Design System
 - **Brand color**: `#BE5343` (Maximum New York red) — set as `--color-accent` in CSS
-- **Navbar**: Glassmorphism (`rgba` background + `backdrop-filter: blur(8px)`), 64px height (`--nav-height`). "MNY" monogram pill (JetBrains Mono) next to brand name. "Explore" dropdown groups all visualization links — desktop: hover/click to open, white glass panel with fade-in animation, active page gets red left bar, trigger gets white underline when any child page is active. Closes on click-outside or Escape. Mobile: dropdown items display directly in slide-out (no extra tap), trigger becomes uppercase "EXPLORE" section header, chevron hidden. Mobile slide-out also uses glassmorphism.
+- **Navbar**: Glassmorphism (`rgba` background + `backdrop-filter: blur(8px)`), 64px height (`--nav-height`). "MNY" monogram pill (JetBrains Mono) next to brand name. "Explore" dropdown groups all visualization links — desktop: hover/click to open, white glass panel with fade-in animation, active page gets red left bar, trigger gets white underline when any child page is active. Closes on click-outside or Escape. "Pigeons" pill toggle activates a site-wide canvas particle overlay (~28 pigeon silhouettes with wing-flap/coast cycles + drifting feathers); warm muted palette, `pointer-events: none` so site remains interactive. Mobile: dropdown items display directly in slide-out (no extra tap), trigger becomes uppercase "EXPLORE" section header, chevron hidden. Mobile slide-out also uses glassmorphism.
 - **Dark cards**: `#0a0e17` background, used for State Trajectory and Growth Chart
 - **Light cards**: White background, used for Expense Budget
 - **Fonts**: Source Serif 4 (display), DM Sans (body), JetBrains Mono (mono), IBM Plex Sans (Growth Chart component)
