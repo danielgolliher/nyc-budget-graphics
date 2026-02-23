@@ -41,6 +41,14 @@ const categories = [
     preview: 'previews/payroll.svg',
     component: lazy(() => import('./pages/PayrollPage')),
   },
+  {
+    slug: 'met-explorer',
+    label: 'Met Museum Explorer',
+    description:
+      "Discover and explore 500,000+ artworks from The Metropolitan Museum of Art's open collection.",
+    preview: 'previews/met-explorer.svg',
+    component: lazy(() => import('./pages/MetExplorerPage')),
+  },
 ]
 
 export default categories
