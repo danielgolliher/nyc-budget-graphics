@@ -90,7 +90,12 @@ function FilterBadge({ filtered, total, filteredTotal }) {
       borderRadius: 6, padding: '4px 12px', marginBottom: 12,
       fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: '#e8a89f',
     }}>
-      <span style={{ fontWeight: 600 }}>Filtered:</span> showing {filteredTotal.toLocaleString()} of {total.toLocaleString()} employees ({(total - filteredTotal).toLocaleString()} with {'\u2264'} $0 comp removed)
+      <span className="filter-label-full">
+        <span style={{ fontWeight: 600 }}>Filtered:</span> showing {filteredTotal.toLocaleString()} of {total.toLocaleString()} employees ({(total - filteredTotal).toLocaleString()} with {'\u2264'} $0 comp removed)
+      </span>
+      <span className="filter-label-short">
+        <span style={{ fontWeight: 600 }}>Filtered:</span> {filteredTotal.toLocaleString()} of {total.toLocaleString()}
+      </span>
     </div>
   )
 }

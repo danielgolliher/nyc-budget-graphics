@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import {
   AgencyCompensationChart, OvertimeChart, PayrollStats,
   AgencyOvertimeDollarsChart, TopOvertimeEarnersChart, TopSalariesChart,
@@ -23,6 +23,29 @@ export default function PayrollPage() {
   const outlierOtCardRef = useRef(null)
   const outlierSalaryCardRef = useRef(null)
   const [filterPositive, setFilterPositive] = useState(false)
+  const [activeSection, setActiveSection] = useState('')
+
+  // IntersectionObserver for active section highlighting
+  useEffect(() => {
+    const ids = SECTIONS.map(s => s.id)
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id)
+          }
+        }
+      },
+      { rootMargin: '-120px 0px -60% 0px', threshold: 0 }
+    )
+    ids.forEach(id => {
+      const el = document.getElementById(id)
+      if (el) observer.observe(el)
+    })
+    return () => observer.disconnect()
+  }, [])
+
+  const filterKey = filterPositive ? 'f' : 'u'
 
   return (
     <div className="page-container">
@@ -34,9 +57,9 @@ export default function PayrollPage() {
       </div>
       <div style={{
         maxWidth: 780, margin: '0 auto 12px', padding: '8px 16px',
-        background: 'rgba(190,83,67,0.08)', border: '1px solid rgba(190,83,67,0.2)',
+        background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.25)',
         borderRadius: 8, textAlign: 'center',
-        fontSize: 13, color: '#64748b', fontFamily: "'DM Sans', sans-serif",
+        fontSize: 13, color: '#92702a', fontFamily: "'DM Sans', sans-serif",
       }}>
         This data is still being cleaned. Please recheck anything you find on the page if this banner is up.
         <br />[Last updated February 22, 2026]
@@ -80,11 +103,21 @@ export default function PayrollPage() {
         </p>
       </div>
 
-      {/* Controls bar: filter toggle + chart nav */}
+      {/* FY selector + filter toggle */}
       <div style={{
-        maxWidth: 900, margin: '0 auto 28px', padding: '0 16px',
+        maxWidth: 900, margin: '0 auto 12px', padding: '0 16px',
         fontFamily: "'DM Sans', sans-serif",
       }}>
+        {/* Fiscal Year selector (disabled — coming soon) */}
+        <div className="fy-selector-wrapper">
+          <select disabled defaultValue="2025">
+            <option value="2025">FY 2025</option>
+            <option value="2024">FY 2024</option>
+            <option value="2023">FY 2023</option>
+          </select>
+          <span className="coming-soon-badge">Coming Soon!</span>
+        </div>
+
         {/* Filter toggle */}
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -92,15 +125,7 @@ export default function PayrollPage() {
         }}>
           <button
             onClick={() => setFilterPositive(!filterPositive)}
-            style={{
-              display: 'flex', alignItems: 'center', gap: 10,
-              background: filterPositive ? 'rgba(190,83,67,0.12)' : 'rgba(0,0,0,0.04)',
-              border: `1px solid ${filterPositive ? 'rgba(190,83,67,0.4)' : 'rgba(0,0,0,0.12)'}`,
-              borderRadius: 8, padding: '8px 18px', cursor: 'pointer',
-              fontSize: 13, color: filterPositive ? '#BE5343' : '#64748b',
-              fontFamily: "'DM Sans', sans-serif", transition: 'all 0.2s',
-              fontWeight: filterPositive ? 600 : 400,
-            }}
+            className={`payroll-filter-toggle${filterPositive ? ' on' : ''}`}
           >
             <span style={{
               display: 'inline-block', width: 36, height: 20, borderRadius: 10,
@@ -113,83 +138,75 @@ export default function PayrollPage() {
                 transition: 'left 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
               }} />
             </span>
-            {filterPositive
-              ? 'Showing only employees with > $0 total comp (549,246)'
-              : 'Showing all employees including $0 / negative adjustments (550,219)'}
+            <span className="filter-label-full">
+              {filterPositive
+                ? 'Showing only employees with > $0 total comp (549,246)'
+                : 'Showing all employees including $0 / negative adjustments (550,219)'}
+            </span>
+            <span className="filter-label-short">
+              {filterPositive
+                ? 'Filtered: >$0 comp only (549,246)'
+                : 'All employees (550,219)'}
+            </span>
           </button>
         </div>
+      </div>
 
-        {/* Chart navigation */}
-        <div style={{
-          display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 8,
-        }}>
+      {/* Sticky chart navigation */}
+      <div className="payroll-chart-nav-sticky">
+        <div className="payroll-chart-nav-inner">
           {SECTIONS.map(s => (
             <button
               key={s.id}
+              className={`payroll-nav-pill${activeSection === s.id ? ' active' : ''}`}
               onClick={() => document.getElementById(s.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-              style={{
-                background: 'rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.08)',
-                borderRadius: 20, padding: '6px 16px', cursor: 'pointer',
-                fontSize: 13, color: '#475569', fontFamily: "'DM Sans', sans-serif",
-                transition: 'all 0.15s', fontWeight: 500,
-              }}
-              onMouseEnter={e => { e.target.style.background = 'rgba(190,83,67,0.08)'; e.target.style.color = '#BE5343'; e.target.style.borderColor = 'rgba(190,83,67,0.3)' }}
-              onMouseLeave={e => { e.target.style.background = 'rgba(0,0,0,0.04)'; e.target.style.color = '#475569'; e.target.style.borderColor = 'rgba(0,0,0,0.08)' }}
             >
               {s.label}
             </button>
           ))}
         </div>
+        <p className="mobile-tap-hint">Tip: Tap any bar to select and sum values</p>
       </div>
 
-      <div id="agencies" className="chart-card dark-card" ref={mainCardRef} style={{ scrollMarginTop: 24 }}>
+      <div id="agencies" className="chart-card dark-card" ref={mainCardRef} style={{ scrollMarginTop: 120 }}>
         <ShareMenu chartRef={mainCardRef} chartId="nyc-payroll-agencies" title="NYC Payroll — Top Agencies" dark />
-        <PayrollStats filtered={filterPositive} />
-        <AgencyCompensationChart filtered={filterPositive} />
-        <p className="chart-source" style={{ textAlign: 'center', marginTop: 24 }}>
-          Source: NYC Open Data — Citywide Payroll Data (Office of Payroll Administration)
-        </p>
+        <PayrollStats key={`stats-${filterKey}`} filtered={filterPositive} />
+        <AgencyCompensationChart key={`agencies-${filterKey}`} filtered={filterPositive} />
       </div>
 
-      <div id="distribution" className="chart-card dark-card" ref={distCardRef} style={{ scrollMarginTop: 24 }}>
+      <div id="distribution" className="chart-card dark-card" ref={distCardRef} style={{ scrollMarginTop: 120 }}>
         <ShareMenu chartRef={distCardRef} chartId="nyc-payroll-distribution" title="NYC Payroll — Compensation Distribution" dark />
-        <CompensationDistributionChart filtered={filterPositive} />
-        <p className="chart-source" style={{ textAlign: 'center', marginTop: 24 }}>
-          Source: NYC Open Data — Citywide Payroll Data (Office of Payroll Administration)
-        </p>
+        <CompensationDistributionChart key={`dist-${filterKey}`} filtered={filterPositive} />
       </div>
 
-      <div id="ot-dollars" className="chart-card dark-card" ref={otDollarsCardRef} style={{ scrollMarginTop: 24 }}>
+      <div id="ot-dollars" className="chart-card dark-card" ref={otDollarsCardRef} style={{ scrollMarginTop: 120 }}>
         <ShareMenu chartRef={otDollarsCardRef} chartId="nyc-payroll-ot-dollars" title="NYC Payroll — Total Overtime by Agency" dark />
-        <AgencyOvertimeDollarsChart filtered={filterPositive} />
-        <p className="chart-source" style={{ textAlign: 'center', marginTop: 24 }}>
-          Source: NYC Open Data — Citywide Payroll Data (Office of Payroll Administration)
-        </p>
+        <AgencyOvertimeDollarsChart key={`otd-${filterKey}`} filtered={filterPositive} />
       </div>
 
-      <div id="ot-ratio" className="chart-card dark-card" ref={otPctCardRef} style={{ scrollMarginTop: 24 }}>
+      <div id="ot-ratio" className="chart-card dark-card" ref={otPctCardRef} style={{ scrollMarginTop: 120 }}>
         <ShareMenu chartRef={otPctCardRef} chartId="nyc-payroll-overtime" title="NYC Payroll — Overtime Ratio" dark />
-        <OvertimeChart filtered={filterPositive} />
-        <p className="chart-source" style={{ textAlign: 'center', marginTop: 24 }}>
-          Source: NYC Open Data — Citywide Payroll Data (Office of Payroll Administration)
-        </p>
+        <OvertimeChart key={`otr-${filterKey}`} filtered={filterPositive} />
       </div>
 
-      <div id="top-ot" className="chart-card dark-card" ref={outlierOtCardRef} style={{ scrollMarginTop: 24 }}>
+      <div id="top-ot" className="chart-card dark-card" ref={outlierOtCardRef} style={{ scrollMarginTop: 120 }}>
         <ShareMenu chartRef={outlierOtCardRef} chartId="nyc-payroll-top-ot-earners" title="NYC Payroll — Top OT Earners" dark />
-        <TopOvertimeEarnersChart />
-        <p className="chart-source" style={{ textAlign: 'center', marginTop: 24 }}>
-          Source: NYC Open Data — Citywide Payroll Data (Office of Payroll Administration)
-        </p>
+        <TopOvertimeEarnersChart key={`topot-${filterKey}`} />
       </div>
 
-      <div id="top-salaries" className="chart-card dark-card" ref={outlierSalaryCardRef} style={{ scrollMarginTop: 24 }}>
+      <div id="top-salaries" className="chart-card dark-card" ref={outlierSalaryCardRef} style={{ scrollMarginTop: 120 }}>
         <ShareMenu chartRef={outlierSalaryCardRef} chartId="nyc-payroll-top-salaries" title="NYC Payroll — Highest Salaries" dark />
-        <TopSalariesChart />
-        <p className="chart-source" style={{ textAlign: 'center', marginTop: 24 }}>
-          Source: NYC Open Data — Citywide Payroll Data (Office of Payroll Administration)
-        </p>
+        <TopSalariesChart key={`topsal-${filterKey}`} />
       </div>
+
+      <p className="payroll-consolidated-source">
+        Source:{' '}
+        <a href="https://data.cityofnewyork.us/City-Government/Citywide-Payroll-Data-Fiscal-Year-/k397-673e"
+          target="_blank" rel="noopener noreferrer">
+          NYC Open Data — Citywide Payroll Data
+        </a>{' '}
+        (Office of Payroll Administration)
+      </p>
     </div>
   )
 }

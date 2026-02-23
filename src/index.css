@@ -738,6 +738,150 @@ a:hover {
   margin-bottom: 16px;
 }
 
+/* ─── Payroll Page: Sticky Chart Nav ─── */
+.payroll-chart-nav-sticky {
+  position: sticky;
+  top: var(--nav-height);
+  z-index: 100;
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--color-border-light);
+  padding: 10px 16px;
+  margin: 0 -24px 28px;
+}
+
+.payroll-chart-nav-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* ─── Payroll Page: Nav Pills ─── */
+.payroll-nav-pill {
+  background: rgba(0,0,0,0.04);
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 20px;
+  padding: 6px 16px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #475569;
+  font-family: var(--font-body);
+  transition: all 0.15s;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.payroll-nav-pill:hover {
+  background: rgba(190,83,67,0.08);
+  color: var(--color-accent);
+  border-color: rgba(190,83,67,0.3);
+}
+
+.payroll-nav-pill.active {
+  background: rgba(190,83,67,0.12);
+  color: var(--color-accent);
+  border-color: rgba(190,83,67,0.4);
+  font-weight: 600;
+}
+
+/* ─── Payroll Page: Filter Toggle ─── */
+.payroll-filter-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(0,0,0,0.04);
+  border: 1px solid rgba(0,0,0,0.12);
+  border-radius: 8px;
+  padding: 8px 18px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #64748b;
+  font-family: var(--font-body);
+  transition: all 0.2s;
+  font-weight: 400;
+}
+
+.payroll-filter-toggle.on {
+  background: rgba(190,83,67,0.12);
+  border-color: rgba(190,83,67,0.4);
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
+/* ─── Payroll Page: FY Selector ─── */
+.fy-selector-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.fy-selector-wrapper select {
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 600;
+  padding: 10px 36px 10px 16px;
+  border-radius: 8px;
+  border: 2px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+  opacity: 0.5;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238B92A0' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+}
+
+.coming-soon-badge {
+  display: inline-block;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-accent);
+  letter-spacing: 0.03em;
+  animation: comingSoonPulse 2s ease-in-out infinite;
+}
+
+@keyframes comingSoonPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+/* ─── Payroll Page: Mobile Tap Hint ─── */
+.mobile-tap-hint {
+  display: none;
+  text-align: center;
+  font-size: 12px;
+  color: var(--color-text-muted);
+  font-family: var(--font-body);
+  margin-top: 8px;
+}
+
+/* ─── Payroll Page: Filter Label Responsive ─── */
+.filter-label-short { display: none; }
+.filter-label-full { display: inline; }
+
+/* ─── Payroll Page: Consolidated Source ─── */
+.payroll-consolidated-source {
+  text-align: center;
+  font-size: 11px;
+  color: #64748b;
+  font-family: var(--font-body);
+  padding: 24px 16px 0;
+  margin-top: 8px;
+}
+
+.payroll-consolidated-source a {
+  color: #7fb3d3;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 /* ─── Responsive ─── */
 @media (max-width: 768px) {
   .page-header h1 {
@@ -802,5 +946,37 @@ a:hover {
     background: rgba(255,255,255,0.15);
     border-left: 3px solid #fff;
     padding-left: 21px;
+  }
+
+  /* Payroll: filter label mobile */
+  .filter-label-short { display: inline; }
+  .filter-label-full { display: none; }
+
+  /* Payroll: sticky nav mobile */
+  .payroll-chart-nav-sticky {
+    margin: 0 -16px 20px;
+    padding: 8px 12px;
+  }
+  .payroll-chart-nav-inner {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 6px;
+  }
+  .payroll-chart-nav-inner::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Payroll: mobile tap hint */
+  .mobile-tap-hint {
+    display: block;
+  }
+
+  /* Payroll: FY selector mobile */
+  .fy-selector-wrapper {
+    flex-direction: column;
+    gap: 6px;
   }
 }
