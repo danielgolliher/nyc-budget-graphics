@@ -28,6 +28,8 @@ This is the **Maximum New York Data Viz & Art** site — a collection of interac
   - **Normal routes** (`/`, `/<slug>`) — wrapped in `Layout` (navbar + footer)
   - **Embed routes** (`/embed/<slug>`) — same page components but wrapped in `.embed-wrapper` which hides page headers, share buttons, and chrome via CSS
 - `public/404.html` + script in `index.html` — SPA redirect trick for GitHub Pages (rewrites paths to query params and back)
+- **Per-route `index.html` files** in `public/<slug>/` — each has page-specific OG/Twitter meta tags for rich social media previews, plus the same SPA redirect script so browsers still land in the React app. GitHub Pages serves these directly (not via 404), so crawlers see the meta tags.
+- **Homepage** (`src/pages/HomePage.jsx`) — Shows all visualization cards from `categories.js`, with subtitle containing contact info (email `daniel@maximumnewyork.com` + LinkedIn/X links)
 
 ### Adding a New Visualization
 1. Create the chart component in `src/components/`
@@ -49,6 +51,8 @@ This is the **Maximum New York Data Viz & Art** site — a collection of interac
 | `src/App.jsx` | Route definitions for normal and embed modes |
 | `index.html` | Google Fonts (Source Serif 4, JetBrains Mono, DM Sans, IBM Plex Sans), analytics, SPA redirect script |
 | `public/CNAME` | Custom domain — **do not delete** or deploys will break the domain |
+| `public/<slug>/index.html` | Per-route HTML files with page-specific OG/Twitter meta tags + SPA redirect script — enables rich social media previews for each page |
+| `public/og-met-explorer.jpg` | Met Explorer social preview image (Degas' *The Dance Class*) |
 | `public/data/nyc_fy_inflation_data.csv` | BLS CPI-U inflation data (FY2001–2025, NYC Metro Area) — downloadable source for inflation overlay |
 | `src/data/nycPayroll2025.js` | FY2025 payroll data — agency totals (raw + filtered), OT by agency, top earners, salary distribution, summary stats |
 | `src/components/PayrollCharts.jsx` | 6 payroll chart components + PayrollStats + shared hooks (useSelection, SelectionBar, FilterBadge) |
@@ -84,12 +88,12 @@ This is the **Maximum New York Data Viz & Art** site — a collection of interac
    - **Surprise Me**: Button that picks a random department and loads its artworks with shuffled results.
    - **Gallery grid**: 4-column card grid (3 on tablet, 2 on mobile) with 3:4 aspect ratio image thumbnails, title, and artist. Lazy-loaded images, staggered fade-in animation. **Infinite scroll** via `IntersectionObserver` on a sentinel div — auto-loads next batch of 12 when scrolling near the bottom. Loading indicator shown during fetch.
    - **Zero-results state**: When search returns no results, shows the search term and active department in the message, plus a "Clear Search" button.
-   - **Detail overlay**: Full artwork view with high-res image, metadata fields (department, medium, dimensions, classification, credit line, accession number), "View on Met Museum" link, and favorite/unfavorite button. Docked below navbar (`top: var(--nav-height)`) on desktop; full-screen takeover on mobile. Closes via ✕, Escape, or backdrop click. Body scroll lock.
+   - **Detail overlay**: Full artwork view with high-res image, metadata fields (department, medium, dimensions, classification, credit line, accession number), "View on Met Museum" link, and favorite/unfavorite button. Docked below navbar (`top: var(--nav-height)`) on desktop; full-screen takeover on mobile. Closes via ✕, Escape, or backdrop click. Body scroll lock with `position: fixed` + scroll position save/restore to prevent iOS viewport shift.
    - **Favorites system**: Session-only (no persistence). Uses `Map` keyed by `objectID` for O(1) lookup + insertion order.
      - **Star buttons**: On gallery cards (top-right of image, visible on hover/always on mobile), hero image, and detail overlay. Gold filled when starred, outline when not. `e.stopPropagation()` prevents opening detail view.
      - **Floating action button (FAB)**: Fixed bottom-right, gold circle with star icon + count badge. Appears when `favorites.size > 0`. Opens the side panel.
      - **Favorites side panel**: Slides in from right (`min(380px, 85vw)` — tablet-friendly, full-width on phone). Contains: header with count, amber session notice, scrollable list of favorited artworks (60×60 thumbnails, title, artist, remove button), and email form footer. Click artwork to open detail overlay. Escape/backdrop to close. Body scroll lock.
-     - **Email favorites**: User enters email and clicks "Send". POSTs to a **Cloudflare Worker** (`met-favorites-email.danielgolliher.workers.dev`) which sends a formatted HTML email via **Resend API** (from `favorites@data.maximumnewyork.com`). The email has a gold-branded header, artwork cards with thumbnails/titles/artists/dates/links, and an "Explore More Art" CTA linking back to the page. Shows sending/success/error states inline.
+     - **Email favorites**: User enters email and clicks "Send". POSTs to a **Cloudflare Worker** (`met-favorites-email.danielgolliher.workers.dev`) which sends a formatted HTML email via **Resend API** (from `favorites@data.maximumnewyork.com`). The email has a gold-branded header, artwork cards with thumbnails/titles/artists/dates/links, and an "Explore More Art" CTA linking back to the page. Shows sending/success/error states inline. Email input uses 16px font on mobile to prevent iOS Safari auto-zoom.
    - **Back-to-top button**: Fixed bottom-left (↑ arrow, warm gray), appears when `scrollY > 600`. Smooth-scrolls to top on click. Opposite corner from FAB.
    - **Tip banner**: Gold-bordered note at top of page explaining the star-and-email feature.
    - **Data source**: Met Museum Open Access API (no API key required). Initial load uses 12 pre-verified European Paintings seed IDs, then background-fetches full department list for load-more. Object cache (`useRef(Map)`) prevents redundant fetches. `AbortController` cancels in-flight requests on navigation.
@@ -109,6 +113,12 @@ This is the **Maximum New York Data Viz & Art** site — a collection of interac
 - **Link**: Copies canonical page URL (uses `useLocation` for clean path)
 - **Download**: html2canvas capture of `chartRef`, excludes `.share-menu-controls` (but keeps QR), adds red credit bar with attribution
 - **Embed**: Generates iframe pointing to `/embed/<slug>` route (chart-only, no site chrome)
+
+### Social Media Previews (Open Graph)
+- Each page has a `public/<slug>/index.html` with `og:title`, `og:description`, `og:image`, and Twitter Card meta tags
+- Default OG image: `og-image.png` (used by most pages)
+- Met Explorer uses `og-met-explorer.jpg` (Degas' *The Dance Class*, downloaded from Met API)
+- To add a preview for a new page: create `public/<slug>/index.html` following the pattern in existing files (meta tags + SPA redirect script)
 
 ### Deployment Notes
 - Always use `npm run deploy` which builds and pushes to `gh-pages` branch
