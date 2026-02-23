@@ -65,18 +65,22 @@ function shuffleArray(arr) {
 
 // ─── Sub-components ───
 
-function SearchBar({ searchQuery, setSearchQuery, onSearch, onClear, hasResults }) {
+function SearchBar({ searchQuery, setSearchQuery, onSearch, onClear, hasResults, department }) {
   const handleSubmit = (e) => {
     e.preventDefault()
     if (searchQuery.trim()) onSearch(searchQuery.trim())
   }
+
+  const placeholder = department && department !== 'All'
+    ? `Search in ${department}...`
+    : 'Search artworks... (e.g. van gogh, Egyptian sculpture)'
 
   return (
     <form className="met-search-bar" onSubmit={handleSubmit}>
       <input
         className="met-search-input"
         type="text"
-        placeholder="Search artworks... (e.g. van gogh, Egyptian sculpture)"
+        placeholder={placeholder}
         value={searchQuery}
         onChange={e => setSearchQuery(e.target.value)}
       />
@@ -93,14 +97,16 @@ function SearchBar({ searchQuery, setSearchQuery, onSearch, onClear, hasResults 
 function DepartmentChips({ department, onSelect }) {
   return (
     <div className="met-departments">
-      {DEPARTMENTS.map(dept => (
-        <button
-          key={dept}
-          className={`met-dept-chip${department === dept ? ' active' : ''}`}
-          onClick={() => onSelect(dept)}
-        >
-          {dept}
-        </button>
+      {DEPARTMENTS.map((dept, i) => (
+        <Fragment key={dept}>
+          <button
+            className={`met-dept-chip${department === dept ? ' active' : ''}${dept === 'All' ? ' all-chip' : ''}`}
+            onClick={() => onSelect(dept)}
+          >
+            {dept}
+          </button>
+          {i === 0 && <span className="met-dept-separator" />}
+        </Fragment>
       ))}
     </div>
   )
@@ -114,7 +120,7 @@ function SurpriseMeButton({ onClick, loading }) {
   )
 }
 
-function HeroArtwork({ artwork, onClick, isFavorite, toggleFavorite }) {
+function HeroArtwork({ artwork, onClick, isFavorite, toggleFavorite, onNext }) {
   if (!artwork) return null
   return (
     <div className="met-hero" onClick={() => onClick(artwork)}>
@@ -130,6 +136,15 @@ function HeroArtwork({ artwork, onClick, isFavorite, toggleFavorite }) {
       >
         {isFavorite(artwork.objectID) ? '★' : '☆'}
       </button>
+      {onNext && (
+        <button
+          className="met-hero-next"
+          onClick={e => { e.stopPropagation(); onNext() }}
+          title="Next featured artwork"
+        >
+          →
+        </button>
+      )}
       <div className="met-hero-overlay">
         <div className="met-hero-title">{artwork.title}</div>
         {artwork.artistDisplayName && (
@@ -433,9 +448,11 @@ export default function MetExplorer() {
   const [loadedCount, setLoadedCount] = useState(0)
   const [favorites, setFavorites] = useState(() => new Map())
   const [showFavorites, setShowFavorites] = useState(false)
+  const [showBackToTop, setShowBackToTop] = useState(false)
 
   const objectCache = useRef(new Map())
   const abortRef = useRef(null)
+  const sentinelRef = useRef(null)
 
   const toggleFavorite = useCallback((artwork) => {
     setFavorites(prev => {
@@ -626,13 +643,52 @@ export default function MetExplorer() {
     loadDepartment(dept)
   }, [department, loadDepartment])
 
+  const handleNextFeatured = useCallback(() => {
+    if (artworks.length === 0) return
+    const randomIndex = Math.floor(Math.random() * artworks.length)
+    const nextFeatured = artworks[randomIndex]
+    setArtworks(prev => {
+      const next = [...prev]
+      next[randomIndex] = featured
+      return next.filter(Boolean)
+    })
+    setFeatured(nextFeatured)
+  }, [artworks, featured])
+
+  // Back-to-top scroll listener
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 600)
+    }
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
   const hasMore = loadedCount + BATCH_SIZE < allIds.length
+
+  // Infinite scroll via IntersectionObserver
+  useEffect(() => {
+    const sentinel = sentinelRef.current
+    if (!sentinel) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !loadingMore) {
+          handleLoadMore()
+        }
+      },
+      { rootMargin: '200px' }
+    )
+
+    observer.observe(sentinel)
+    return () => observer.disconnect()
+  }, [hasMore, loadingMore, handleLoadMore])
 
   return (
     <div className="met-explorer">
       {/* Hero */}
       {loading ? <HeroSkeleton /> : (
-        featured && <HeroArtwork artwork={featured} onClick={setSelectedArtwork} isFavorite={isFavorite} toggleFavorite={toggleFavorite} />
+        featured && <HeroArtwork artwork={featured} onClick={setSelectedArtwork} isFavorite={isFavorite} toggleFavorite={toggleFavorite} onNext={artworks.length > 0 ? handleNextFeatured : null} />
       )}
 
       {/* Favorites Tip */}
@@ -651,6 +707,7 @@ export default function MetExplorer() {
         onSearch={handleSearch}
         onClear={handleClearSearch}
         hasResults={!!searchTerm}
+        department={department}
       />
 
       {/* Department Chips */}
@@ -658,6 +715,13 @@ export default function MetExplorer() {
 
       {/* Surprise Me */}
       <SurpriseMeButton onClick={handleSurpriseMe} loading={loading} />
+
+      {/* Search Context During Loading */}
+      {loading && searchTerm && department !== 'All' && (
+        <div className="met-search-context">
+          Searching in <strong>{department}</strong>...
+        </div>
+      )}
 
       {/* Results Info */}
       {searchTerm && !loading && (
@@ -709,19 +773,28 @@ export default function MetExplorer() {
           {!loading && !error && artworks.length === 0 && !featured && (
             <div className="met-error">
               <div className="met-error-title">No artworks found</div>
-              <div className="met-error-msg">Try a different search term or department.</div>
+              <div className="met-error-msg">
+                {searchTerm ? (
+                  <>No results for "<strong>{searchTerm}</strong>"{department !== 'All' && <> in <strong>{department}</strong></>}. Try a different search term or department.</>
+                ) : (
+                  'Try a different search term or department.'
+                )}
+              </div>
+              {searchTerm && (
+                <button className="met-empty-clear-btn" onClick={handleClearSearch}>
+                  Clear Search
+                </button>
+              )}
             </div>
           )}
 
           {hasMore && artworks.length > 0 && (
-            <div className="met-load-more">
-              <button
-                className="met-load-more-btn"
-                onClick={handleLoadMore}
-                disabled={loadingMore}
-              >
-                {loadingMore ? 'Loading...' : 'Load More'}
-              </button>
+            <div className="met-load-sentinel" ref={sentinelRef}>
+              {loadingMore && (
+                <div className="met-load-more">
+                  <span className="met-load-more-btn" style={{ cursor: 'default', opacity: 0.7 }}>Loading...</span>
+                </div>
+              )}
             </div>
           )}
         </>
@@ -748,6 +821,17 @@ export default function MetExplorer() {
           onRemove={toggleFavorite}
           onSelect={(art) => { setShowFavorites(false); setSelectedArtwork(art) }}
         />
+      )}
+
+      {/* Back to Top */}
+      {showBackToTop && (
+        <button
+          className="met-back-to-top"
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          title="Back to top"
+        >
+          ↑
+        </button>
       )}
     </div>
   )

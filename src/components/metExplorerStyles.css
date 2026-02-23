@@ -160,20 +160,13 @@
 /* ─── Department Chips ─── */
 .met-departments {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   margin-bottom: 20px;
-  overflow-x: auto;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
   padding-bottom: 4px;
 }
 
-.met-departments::-webkit-scrollbar {
-  display: none;
-}
-
 .met-dept-chip {
-  flex-shrink: 0;
   padding: 8px 16px;
   font-family: var(--font-body);
   font-size: 13px;
@@ -200,6 +193,25 @@
   border-color: var(--met-gold);
   color: #fff;
   font-weight: 600;
+}
+
+/* "All" chip — visually distinct reset action */
+.met-dept-chip.all-chip {
+  border-style: dashed;
+  font-weight: 600;
+}
+
+.met-dept-chip.all-chip.active {
+  border-style: solid;
+}
+
+/* Separator after "All" chip */
+.met-dept-separator {
+  width: 1px;
+  height: 24px;
+  background: var(--met-border);
+  align-self: center;
+  flex-shrink: 0;
 }
 
 /* ─── Surprise Me Button ─── */
@@ -398,7 +410,7 @@
 /* ─── Detail Overlay ─── */
 .met-detail-overlay {
   position: fixed;
-  top: 0;
+  top: var(--nav-height);
   left: 0;
   right: 0;
   bottom: 0;
@@ -422,7 +434,7 @@
   border-radius: 12px;
   max-width: 900px;
   width: 100%;
-  max-height: calc(100vh - 48px);
+  max-height: calc(100vh - var(--nav-height) - 48px);
   overflow-y: auto;
   position: relative;
   animation: metDetailSlideUp 0.3s ease;
@@ -665,12 +677,25 @@ body.met-overlay-open {
     justify-content: center;
   }
 
+  .met-departments {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .met-departments::-webkit-scrollbar {
+    display: none;
+  }
+
   .met-dept-chip {
+    flex-shrink: 0;
     min-height: 44px;
     padding: 8px 14px;
   }
 
   .met-detail-overlay {
+    top: 0;
     padding: 0;
     align-items: flex-start;
   }
@@ -867,7 +892,7 @@ body.met-overlay-open {
   top: 0;
   right: 0;
   bottom: 0;
-  width: 380px;
+  width: min(380px, 85vw);
   background: #fff;
   z-index: 1001;
   display: flex;
@@ -1162,6 +1187,103 @@ body.met-overlay-open {
   color: var(--met-gold);
 }
 
+/* ─── Empty State Clear Button ─── */
+.met-empty-clear-btn {
+  padding: 10px 24px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  border: 2px solid var(--met-gold);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--met-gold);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.met-empty-clear-btn:hover {
+  background: var(--met-gold);
+  color: #fff;
+}
+
+/* ─── Search Context Indicator ─── */
+.met-search-context {
+  font-size: 13px;
+  color: var(--met-warm-gray);
+  margin-top: -12px;
+  margin-bottom: 16px;
+}
+
+.met-search-context strong {
+  color: var(--met-dark);
+}
+
+/* ─── Hero Next Button ─── */
+.met-hero-next {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  font-size: 22px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+  transition: transform 0.15s, background 0.2s;
+  opacity: 0;
+  line-height: 1;
+}
+
+.met-hero:hover .met-hero-next {
+  opacity: 1;
+}
+
+.met-hero-next:hover {
+  background: rgba(0, 0, 0, 0.65);
+  transform: translateY(-50%) scale(1.1);
+}
+
+/* ─── Infinite Scroll Sentinel ─── */
+.met-load-sentinel {
+  height: 1px;
+  margin-bottom: 32px;
+}
+
+/* ─── Back to Top Button ─── */
+.met-back-to-top {
+  position: fixed;
+  bottom: 28px;
+  left: 28px;
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(107, 94, 80, 0.85);
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 900;
+  box-shadow: 0 4px 14px rgba(44, 36, 24, 0.2);
+  transition: transform 0.2s, background 0.2s, opacity 0.3s;
+  animation: metFabIn 0.3s ease both;
+  line-height: 1;
+}
+
+.met-back-to-top:hover {
+  background: rgba(107, 94, 80, 1);
+  transform: translateY(-3px);
+}
+
 /* ─── Responsive: Favorites ─── */
 @media (max-width: 600px) {
   .met-star-btn {
@@ -1174,6 +1296,17 @@ body.met-overlay-open {
   .met-fab {
     bottom: 20px;
     right: 20px;
+  }
+
+  .met-back-to-top {
+    bottom: 20px;
+    left: 20px;
+    width: 44px;
+    height: 44px;
+  }
+
+  .met-hero-next {
+    opacity: 1;
   }
 
   .met-favorites-panel {
