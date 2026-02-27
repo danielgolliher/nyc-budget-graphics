@@ -43,7 +43,7 @@ export default function SlopeChart({ data, hoveredState, setHoveredState, active
   if (hoveredData) {
     const d = hoveredData
     const midX = (x1 + x2) / 2
-    const midY = (getY(d.rank1960) + getY(d.rank2024)) / 2
+    const midY = (getY(d.rank1960) + getY(d.rank2025)) / 2
     const boxW = 220
     const boxH = 92
     let boxY = midY - boxH / 2
@@ -59,7 +59,7 @@ export default function SlopeChart({ data, hoveredState, setHoveredState, active
         </text>
         <text x={midX} y={boxY + 35} textAnchor="middle"
           style={{ fontSize: 11, fill: '#94a3b8', fontFamily: "'JetBrains Mono', monospace" }}>
-          {`#${d.rank1960} (${formatPop(d.pop1960)}) → #${d.rank2024} (${formatPop(d.pop2024)})`}
+          {`#${d.rank1960} (${formatPop(d.pop1960)}) → #${d.rank2025} (${formatPop(d.pop2025)})`}
         </text>
         <text x={midX} y={boxY + 52} textAnchor="middle"
           style={{
@@ -93,7 +93,7 @@ export default function SlopeChart({ data, hoveredState, setHoveredState, active
         </text>
         <text x={x2} y={margin.top - 24} textAnchor="middle"
           style={{ fontSize: headerFontSize, fontWeight: 700, fill: '#cbd5e1', fontFamily: "'JetBrains Mono', monospace", letterSpacing: '0.05em' }}>
-          2024
+          2025
         </text>
 
         {/* Alternating row stripes */}
@@ -113,7 +113,7 @@ export default function SlopeChart({ data, hoveredState, setHoveredState, active
           return (
             <line key={d.abbr}
               x1={x1 + 28} y1={getY(d.rank1960)}
-              x2={x2 - 28} y2={getY(d.rank2024)}
+              x2={x2 - 28} y2={getY(d.rank2025)}
               stroke={getLineColor(d)}
               strokeWidth={strokeW}
               strokeLinecap="round"
@@ -156,16 +156,16 @@ export default function SlopeChart({ data, hoveredState, setHoveredState, active
               onMouseEnter={() => setHoveredState(d.abbr)}
               onMouseLeave={() => setHoveredState(null)}
               style={{ cursor: 'pointer' }}>
-              <circle cx={x2} cy={getY(d.rank2024)} r={lit ? 5 : 3.5}
+              <circle cx={x2} cy={getY(d.rank2025)} r={lit ? 5 : 3.5}
                 fill={getLineColor(d)} opacity={opacity} style={{ transition: 'all 0.2s' }} />
-              <text x={x2 + 8} y={getY(d.rank2024) + 1}
+              <text x={x2 + 8} y={getY(d.rank2025) + 1}
                 textAnchor="start" dominantBaseline="middle"
                 style={{
                   fontSize: labelFontSize, fontFamily: "'JetBrains Mono', monospace",
                   fill: lit ? '#f8fafc' : '#94a3b8',
                   fontWeight: lit ? 700 : 400, opacity, transition: 'all 0.2s',
                 }}>
-                {d.rank2024}. {d.abbr}
+                {d.rank2025}. {d.abbr}
               </text>
             </g>
           )

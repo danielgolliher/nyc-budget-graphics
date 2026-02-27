@@ -29,9 +29,28 @@ export default function StateTrajectoryPage() {
       <div className="page-header">
         <h1>The Great Shuffle</h1>
         <p className="subtitle">
-          U.S. State Population Rankings — 1960 vs. 2024.
+          U.S. State Population Rankings — 1960 vs. 2025.
           How states have risen and fallen in the national pecking order over six decades.
         </p>
+        <a
+          href="/data/state_population_rankings_1960_2025.csv"
+          download
+          style={{
+            display: 'inline-block',
+            marginTop: 12,
+            padding: '6px 16px',
+            background: 'rgba(56, 189, 248, 0.12)',
+            border: '1px solid rgba(56, 189, 248, 0.3)',
+            borderRadius: 6,
+            color: '#38bdf8',
+            fontSize: 13,
+            fontFamily: "'JetBrains Mono', monospace",
+            textDecoration: 'none',
+            letterSpacing: '0.02em',
+          }}
+        >
+          ↓ Get the data (CSV)
+        </a>
       </div>
 
       <div className="chart-card dark-card" ref={slopeCardRef}>
@@ -41,7 +60,7 @@ export default function StateTrajectoryPage() {
             Population Rank Changes
           </h2>
           <p style={{ fontSize: 14, color: '#64748b', marginTop: 8 }}>
-            U.S. State Population Rankings — 1960 vs. 2024
+            U.S. State Population Rankings — 1960 vs. 2025
           </p>
         </div>
 
@@ -91,7 +110,7 @@ export default function StateTrajectoryPage() {
         <div style={{ marginBottom: 8 }}>
           <h2 style={{ fontSize: 18, fontWeight: 500, color: '#cbd5e1' }}>Rankings Table</h2>
           <p style={{ fontSize: 11, color: '#475569', marginTop: 4 }}>
-            Click any column header to sort. Shift = ranks gained (+) or lost (−). % Change = population growth since 1960.
+            Click any column header to sort. Shift = ranks gained (+) or lost (−). % Change = population growth 1960–2025.
           </p>
         </div>
 
@@ -102,7 +121,7 @@ export default function StateTrajectoryPage() {
         />
 
         <p className="chart-source" style={{ textAlign: 'center', marginTop: 32 }}>
-          Sources: 1960 U.S. Census · 2024 Census Bureau Estimates (in thousands)
+          Sources: 1960 U.S. Census · 2025 Census Bureau Estimates (in thousands)
         </p>
       </div>
     </div>

@@ -4,14 +4,14 @@ const columns = [
   { key: 'state', label: 'State', align: 'left' },
   { key: 'rank1960', label: 'Rank 1960', align: 'center' },
   { key: 'pop1960', label: 'Pop 1960', align: 'right' },
-  { key: 'rank2024', label: 'Rank 2024', align: 'center' },
-  { key: 'pop2024', label: 'Pop 2024', align: 'right' },
+  { key: 'rank2025', label: 'Rank 2025', align: 'center' },
+  { key: 'pop2025', label: 'Pop 2025', align: 'right' },
   { key: 'shift', label: 'Shift', align: 'center' },
   { key: 'pctChange', label: '% Change', align: 'right' },
 ]
 
 export default function SortableTable({ data, hoveredState, setHoveredState }) {
-  const [sortKey, setSortKey] = useState('rank2024')
+  const [sortKey, setSortKey] = useState('rank2025')
   const [sortDir, setSortDir] = useState('asc')
 
   const handleSort = (key) => {
@@ -70,8 +70,8 @@ export default function SortableTable({ data, hoveredState, setHoveredState }) {
                 <td style={{ fontWeight: isHovered ? 600 : 400, color: '#e2e8f0' }}>{d.state}</td>
                 <td style={{ textAlign: 'center', color: '#94a3b8' }}>{d.rank1960}</td>
                 <td style={{ textAlign: 'right', color: '#94a3b8' }}>{(d.pop1960 * 1000).toLocaleString()}</td>
-                <td style={{ textAlign: 'center', color: '#cbd5e1' }}>{d.rank2024}</td>
-                <td style={{ textAlign: 'right', color: '#cbd5e1' }}>{(d.pop2024 * 1000).toLocaleString()}</td>
+                <td style={{ textAlign: 'center', color: '#cbd5e1' }}>{d.rank2025}</td>
+                <td style={{ textAlign: 'right', color: '#cbd5e1' }}>{(d.pop2025 * 1000).toLocaleString()}</td>
                 <td style={{ textAlign: 'center' }}>
                   <span className="shift-badge" style={{
                     color: d.shift > 0 ? '#4ade80' : d.shift < 0 ? '#f87171' : '#64748b',
