@@ -52,6 +52,15 @@ const categories = [
     preview: 'previews/met-explorer.svg',
     component: lazy(() => import('./pages/MetExplorerPage')),
   },
+  {
+    slug: 'apportionment',
+    label: '2020 Apportionment',
+    navLabel: 'Apportionment',
+    description:
+      'All 435 House seat assignments, step by step, using the Huntington-Hill method and 2020 Census populations.',
+    preview: 'previews/apportionment.svg',
+    component: lazy(() => import('./pages/ApportionmentPage')),
+  },
 ]
 
 export default categories
