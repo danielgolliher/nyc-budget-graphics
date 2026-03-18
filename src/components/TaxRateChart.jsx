@@ -14,9 +14,13 @@ export default function TaxRateChart() {
   const containerRef = useRef(null)
   const tipRef = useRef(null)
   const stateRef = useRef({ cssW: 0, startTime: null, rafId: null, hoverIdx: -1, pausedAt: null, scrubT: null })
+  const pausedRef = useRef(false)
   const [tooltip, setTooltip] = useState(null)
   const [paused, setPaused] = useState(false)
   const [scrubValue, setScrubValue] = useState(0) // 0-100, for display
+
+  // Keep ref in sync with state
+  useEffect(() => { pausedRef.current = paused }, [paused])
 
   const W = useCallback(() => stateRef.current.cssW - ML - MR, [])
   const H = useCallback(() => CSS_H - MT - MB, [])
@@ -199,7 +203,7 @@ export default function TaxRateChart() {
         return
       }
 
-      if (paused) {
+      if (pausedRef.current) {
         if (s.pausedAt == null) s.pausedAt = ts
         const t = (s.pausedAt - s.startTime) % LOOP
         draw(t)
@@ -222,7 +226,7 @@ export default function TaxRateChart() {
       window.removeEventListener('resize', onResize)
       if (stateRef.current.rafId) cancelAnimationFrame(stateRef.current.rafId)
     }
-  }, [resize, draw, paused])
+  }, [resize, draw])
 
   const handleMouseMove = useCallback((e) => {
     const canvas = canvasRef.current
