@@ -61,6 +61,15 @@ const categories = [
     preview: 'previews/apportionment.svg',
     component: lazy(() => import('./pages/ApportionmentPage')),
   },
+  {
+    slug: 'state-admission',
+    label: 'Admission of States',
+    navLabel: 'State Admission',
+    description:
+      'All 50 states, from Delaware (1787) to Hawaii (1959) — how each joined the United States.',
+    preview: 'previews/state-admission.svg',
+    component: lazy(() => import('./pages/StateAdmissionPage')),
+  },
 ]
 
 export default categories
