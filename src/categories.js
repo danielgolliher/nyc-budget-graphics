@@ -70,6 +70,15 @@ const categories = [
     preview: 'previews/state-admission.svg',
     component: lazy(() => import('./pages/StateAdmissionPage')),
   },
+  {
+    slug: 'nyc-tax-rate',
+    label: 'NYS-NYC Tax Rate',
+    navLabel: 'Tax Rate',
+    description:
+      'Combined NYS-NYC marginal income tax rate from 1966 to 2025, net of federal deductibility.',
+    preview: 'previews/tax-rate.svg',
+    component: lazy(() => import('./pages/TaxRatePage')),
+  },
 ]
 
 export default categories
