@@ -251,7 +251,7 @@ export default function TaxRateChart() {
   }, [])
 
   return (
-    <div>
+    <div style={{ overflow: 'hidden', maxWidth: '100%' }}>
       <div style={{ marginBottom: 12 }}>
         <p style={{
           fontFamily: "'Source Serif 4', Georgia, serif", fontSize: 18,
@@ -266,8 +266,9 @@ export default function TaxRateChart() {
           Net of federal deductibility · 1966–2025
         </p>
         <div style={{
-          display: 'flex', gap: 24, marginBottom: 12,
+          display: 'flex', gap: 12, marginBottom: 12,
           fontSize: 11, color: '#9aa2be', alignItems: 'center',
+          flexWrap: 'wrap',
         }}>
           <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <span style={{
@@ -298,7 +299,7 @@ export default function TaxRateChart() {
         </div>
       </div>
 
-      <div ref={containerRef} style={{ width: '100%', position: 'relative' }}>
+      <div ref={containerRef} style={{ width: '100%', maxWidth: '100%', position: 'relative', overflow: 'hidden' }}>
         <canvas
           ref={canvasRef}
           style={{ display: 'block', width: '100%', cursor: 'crosshair' }}

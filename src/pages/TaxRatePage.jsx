@@ -39,6 +39,7 @@ export default function TaxRatePage() {
 
       <div className="chart-card" ref={cardRef} style={{
         background: '#fff', borderTop: '3px solid #14237e',
+        overflow: 'hidden',
       }}>
         <ShareMenu chartRef={cardRef} chartId="nyc-tax-rate" title="Combined NYS-NYC Marginal Income Tax Rate" />
         <TaxRateChart />
