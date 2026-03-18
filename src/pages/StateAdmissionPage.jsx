@@ -1,10 +1,12 @@
 import { useRef } from 'react'
+import StateAdmissionMap from '../components/StateAdmissionMap'
 import StateAdmissionTable from '../components/StateAdmissionTable'
 import ShareMenu from '../components/ShareMenu'
 import '../components/stateAdmissionStyles.css'
 
 export default function StateAdmissionPage() {
-  const cardRef = useRef(null)
+  const mapCardRef = useRef(null)
+  const tableCardRef = useRef(null)
 
   return (
     <div className="page-container">
@@ -37,8 +39,13 @@ export default function StateAdmissionPage() {
         </p>
       </div>
 
-      <div className="chart-card admission-card" ref={cardRef}>
-        <ShareMenu chartRef={cardRef} chartId="state-admission-table" title="Admission of States to the Union" />
+      <div className="chart-card admission-card" ref={mapCardRef}>
+        <ShareMenu chartRef={mapCardRef} chartId="state-admission-map" title="Admission of States — Animated Map" />
+        <StateAdmissionMap />
+      </div>
+
+      <div className="chart-card admission-card" ref={tableCardRef}>
+        <ShareMenu chartRef={tableCardRef} chartId="state-admission-table" title="Admission of States to the Union" />
         <StateAdmissionTable />
         <p style={{
           textAlign: 'center', marginTop: 32,
