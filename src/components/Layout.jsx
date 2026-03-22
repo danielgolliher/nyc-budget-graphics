@@ -8,6 +8,9 @@ export default function Layout({ children }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [pigeonsActive, setPigeonsActive] = useState(false)
+  const [nightMode, setNightMode] = useState(() => {
+    return localStorage.getItem('nightMode') === 'true'
+  })
   const location = useLocation()
   const pageUrl = `${window.location.origin}${location.pathname}`
   const dropdownRef = useRef(null)
@@ -18,6 +21,12 @@ export default function Layout({ children }) {
   }
 
   const anyChildActive = categories.some(({ slug }) => location.pathname === '/' + slug)
+
+  // Sync night mode class on <html> element
+  useEffect(() => {
+    document.documentElement.classList.toggle('night-mode', nightMode)
+    localStorage.setItem('nightMode', nightMode)
+  }, [nightMode])
 
   // Close dropdown on click outside or Escape
   useEffect(() => {
@@ -93,6 +102,13 @@ export default function Layout({ children }) {
                 ))}
               </div>
             </div>
+            <button
+              className={`pigeon-toggle${nightMode ? ' active' : ''}`}
+              onClick={() => setNightMode((n) => !n)}
+              title={nightMode ? 'Switch to day mode' : 'Switch to night mode'}
+            >
+              Night
+            </button>
             <button
               className={`pigeon-toggle${pigeonsActive ? ' active' : ''}`}
               onClick={() => setPigeonsActive((p) => !p)}

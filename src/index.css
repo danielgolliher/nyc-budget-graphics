@@ -21,6 +21,177 @@
   --nav-height: 64px;
 }
 
+/* ─── Night Mode ─── */
+html.night-mode {
+  --color-bg: #121620;
+  --color-surface: #1a1f2e;
+  --color-navy: #e2e8f0;
+  --color-navy-light: #cbd5e1;
+  --color-text: #e2e8f0;
+  --color-text-secondary: #94a3b8;
+  --color-text-muted: #64748b;
+  --color-border: #2d3548;
+  --color-border-light: #232a3b;
+  --color-highlight: #3b2f1a;
+}
+
+html.night-mode .navbar {
+  background: linear-gradient(135deg, rgba(140,50,35,0.92) 0%, rgba(150,65,50,0.92) 100%);
+}
+
+html.night-mode .nav-dropdown-menu {
+  background: rgba(26,31,46,0.97);
+}
+
+html.night-mode .nav-dropdown-item {
+  color: #cbd5e1;
+}
+
+html.night-mode .nav-dropdown-item:hover {
+  background: rgba(255,255,255,0.06);
+  color: #f1f5f9;
+}
+
+html.night-mode .nav-dropdown-item.active {
+  color: var(--color-accent);
+}
+
+html.night-mode .category-card {
+  background: var(--color-surface);
+  border-color: var(--color-border-light);
+}
+
+html.night-mode .category-card:hover {
+  border-color: var(--color-accent);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+html.night-mode .category-card h2 {
+  color: #f1f5f9;
+}
+
+html.night-mode .card-preview {
+  background: #0f1320;
+  border-bottom-color: var(--color-border-light);
+}
+
+html.night-mode .chart-card {
+  background: var(--color-surface);
+  border-color: var(--color-border-light);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+html.night-mode .chart-card h2 {
+  color: #f1f5f9;
+}
+
+html.night-mode .chart-tooltip {
+  background: #1a1f2e;
+  border-color: #2d3548;
+}
+
+html.night-mode .chart-tooltip .tt-name {
+  color: #f1f5f9;
+}
+
+html.night-mode .legend-table thead th {
+  background: #151a28;
+  color: #64748b;
+  border-bottom-color: #2d3548;
+}
+
+html.night-mode .legend-table tbody tr:hover,
+html.night-mode .legend-table tbody tr.highlight {
+  background: #232a3b;
+}
+
+html.night-mode .legend-table tbody td {
+  border-bottom-color: #232a3b;
+  color: #cbd5e1;
+}
+
+html.night-mode .site-footer {
+  border-top-color: var(--color-border);
+}
+
+html.night-mode .footer-attribution {
+  color: #94a3b8;
+}
+
+html.night-mode .share-btn {
+  border-color: #334155;
+  background: #151a28;
+  color: #94a3b8;
+}
+
+html.night-mode .share-btn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+html.night-mode .embed-popover {
+  background: #1a1f2e;
+  border-color: #2d3548;
+}
+
+html.night-mode .embed-popover textarea {
+  background: #121620;
+  border-color: #2d3548;
+  color: #e2e8f0;
+}
+
+html.night-mode .threshold-btn {
+  border-color: #2d3548;
+  background: #151a28;
+  color: #94a3b8;
+}
+
+html.night-mode .threshold-btn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+html.night-mode .threshold-btn.active {
+  background: #cbd5e1;
+  border-color: #cbd5e1;
+  color: #121620;
+}
+
+html.night-mode .payroll-chart-nav-sticky {
+  background: var(--color-bg);
+  border-bottom-color: var(--color-border-light);
+}
+
+html.night-mode .payroll-nav-pill {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(255,255,255,0.1);
+  color: #94a3b8;
+}
+
+html.night-mode .payroll-nav-pill:hover {
+  background: rgba(190,83,67,0.15);
+  color: var(--color-accent);
+  border-color: rgba(190,83,67,0.4);
+}
+
+html.night-mode .payroll-nav-pill.active {
+  background: rgba(190,83,67,0.2);
+  color: var(--color-accent);
+  border-color: rgba(190,83,67,0.5);
+}
+
+html.night-mode .payroll-filter-toggle {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(255,255,255,0.1);
+  color: #94a3b8;
+}
+
+html.night-mode .fy-selector-wrapper select {
+  background-color: #151a28;
+  border-color: #2d3548;
+  color: #64748b;
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -1130,6 +1301,10 @@ a:hover {
     margin: 8px 24px 4px;
     align-self: flex-start;
     font-size: 14px;
+  }
+  /* Night mode: mobile slide-out background */
+  html.night-mode .navbar-links {
+    background: linear-gradient(180deg, rgba(140,50,35,0.97) 0%, rgba(120,40,30,0.97) 100%);
   }
 
   /* Payroll: filter label mobile */
