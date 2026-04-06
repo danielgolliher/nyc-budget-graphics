@@ -10,9 +10,26 @@ export default function OperatingIndicatorsPage() {
       <div className="page-header">
         <h1>NYC Operating Indicators</h1>
         <p className="subtitle">
-          Ten years of city agency performance data &mdash; from crime and fire response to parks
-          attendance and homeless shelter counts. Pick an agency and indicator to explore.
+          Ten years of NYC financial and operating data from the Comptroller&rsquo;s FY2025 report.
+          Explore financial trends, revenues, expenditures, and agency performance indicators.
         </p>
+      </div>
+
+      <div style={{
+        maxWidth: 780, margin: '0 auto 20px', padding: '12px 18px',
+        background: 'rgba(190,83,67,0.08)', border: '1px solid rgba(190,83,67,0.25)',
+        borderRadius: 10, fontSize: 13, lineHeight: 1.6, color: '#94644a',
+        fontFamily: "'DM Sans', sans-serif",
+      }}>
+        Data from the <a
+          href="https://comptroller.nyc.gov/wp-content/uploads/2025/11/8-Financial-Trends-and-Other-Statistical-Information-FY25.pdf"
+          target="_blank" rel="noopener noreferrer"
+          style={{ color: 'var(--color-accent)', fontWeight: 600 }}
+        >Statistical Section (PDF)</a> of the NYC Comptroller&rsquo;s <a
+          href="https://comptroller.nyc.gov/reports/annual-comprehensive-financial-reports/"
+          target="_blank" rel="noopener noreferrer"
+          style={{ color: 'var(--color-accent)', fontWeight: 600 }}
+        >Annual Comprehensive Financial Report</a> for Fiscal Year 2025.
       </div>
 
       <div className="chart-card dark-card" ref={cardRef}>

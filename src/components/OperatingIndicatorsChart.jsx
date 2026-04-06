@@ -1,9 +1,20 @@
 import { useState, useMemo } from 'react'
 import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis,
-  CartesianGrid, Tooltip, ReferenceLine,
+  CartesianGrid, Tooltip,
 } from 'recharts'
-import { YEARS, AGENCIES } from '../data/operatingIndicators'
+import { YEARS as OP_YEARS, AGENCIES } from '../data/operatingIndicators'
+import { YEARS as FT_YEARS, FINANCIAL_TRENDS } from '../data/financialTrends'
+import { YEARS as RD_YEARS, REVENUE_CAPACITY, DEBT_CAPACITY } from '../data/revenueAndDebt'
+import { YEARS as DM_YEARS, DEMOGRAPHICS } from '../data/demographics'
+
+const SECTIONS = [
+  { key: 'financial', label: 'Financial Trends' },
+  { key: 'revenue', label: 'Revenue Capacity' },
+  { key: 'debt', label: 'Debt Capacity' },
+  { key: 'demographics', label: 'Demographics & Economy' },
+  { key: 'operating', label: 'Operating Information' },
+]
 
 const CATEGORY_ORDER = [
   'General Government',
@@ -20,9 +31,11 @@ const CATEGORY_ORDER = [
 
 function formatNum(n) {
   if (n === null || n === undefined) return '\u2014'
-  if (Math.abs(n) >= 1e6) return (n / 1e6).toFixed(1) + 'M'
-  if (Math.abs(n) >= 1e4) return (n / 1e3).toFixed(0) + 'K'
-  if (Number.isInteger(n) || Math.abs(n) >= 100) return n.toLocaleString('en-US')
+  const abs = Math.abs(n)
+  if (abs >= 1e9) return (n / 1e9).toFixed(1) + 'B'
+  if (abs >= 1e6) return (n / 1e6).toFixed(1) + 'M'
+  if (abs >= 1e4) return (n / 1e3).toFixed(0) + 'K'
+  if (Number.isInteger(n) || abs >= 100) return n.toLocaleString('en-US')
   return n.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 2 })
 }
 
@@ -32,7 +45,6 @@ function formatFull(n) {
   return n.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 2 })
 }
 
-// Group agencies by category
 function getGroupedAgencies() {
   const groups = {}
   for (const [name, info] of Object.entries(AGENCIES)) {
@@ -44,7 +56,7 @@ function getGroupedAgencies() {
     .filter(g => g.agencies.length > 0)
 }
 
-function CustomTooltip({ active, payload, label }) {
+function CustomTooltip({ active, payload, label, dollarUnit }) {
   if (!active || !payload?.length) return null
   const v = payload[0].value
   return (
@@ -56,27 +68,94 @@ function CustomTooltip({ active, payload, label }) {
         {label}
       </div>
       <div style={{ fontSize: 18, fontWeight: 700, color: '#fff' }}>
-        {formatFull(v)}
+        {dollarUnit ? '$' : ''}{formatFull(v)}
+        {dollarUnit ? ' (thousands)' : ''}
       </div>
     </div>
   )
 }
 
+const selectStyle = {
+  width: '100%', padding: '10px 12px', fontSize: 15,
+  background: 'rgba(255,255,255,0.06)', color: '#fff',
+  border: '1px solid rgba(255,255,255,0.15)', borderRadius: 8,
+  fontFamily: "'DM Sans', sans-serif", cursor: 'pointer',
+  appearance: 'none',
+  backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='2' fill='none'/%3E%3C/svg%3E\")",
+  backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center',
+}
+
+const labelStyle = {
+  display: 'block', fontSize: 11, fontWeight: 600, textTransform: 'uppercase',
+  letterSpacing: '0.08em', color: 'rgba(255,255,255,0.4)', marginBottom: 6,
+  fontFamily: "'DM Sans', sans-serif",
+}
+
+const optionStyle = { background: '#0a0e17', color: '#fff' }
+const optionMuted = { background: '#0a0e17', color: '#888' }
+
 export default function OperatingIndicatorsChart() {
-  const [agency, setAgency] = useState('')
+  const [section, setSection] = useState('operating')
+  const [category, setCategory] = useState('')
   const [metric, setMetric] = useState('')
   const [startAtZero, setStartAtZero] = useState(false)
   const [customMin, setCustomMin] = useState('')
   const [customMax, setCustomMax] = useState('')
 
+  const isOperating = section === 'operating'
+  const isFinancial = section === 'financial' || section === 'revenue' || section === 'debt' || section === 'demographics'
   const grouped = useMemo(getGroupedAgencies, [])
-  const metrics = agency ? Object.keys(AGENCIES[agency].metrics) : []
-  const entry = agency && metric ? AGENCIES[agency].metrics[metric] : null
+
+  const sectionData = useMemo(() => {
+    switch (section) {
+      case 'financial': return FINANCIAL_TRENDS
+      case 'revenue': return REVENUE_CAPACITY
+      case 'debt': return DEBT_CAPACITY
+      case 'demographics': return DEMOGRAPHICS
+      default: return null
+    }
+  }, [section])
+
+  // Get category options based on section
+  const categoryOptions = useMemo(() => {
+    if (sectionData) return Object.keys(sectionData)
+    return [] // For operating, we use optgroups
+  }, [sectionData])
+
+  // Get metric options based on section + category
+  const metricOptions = useMemo(() => {
+    if (!category) return []
+    if (sectionData) {
+      const table = sectionData[category]
+      return table ? Object.keys(table.metrics) : []
+    }
+    const agency = AGENCIES[category]
+    return agency ? Object.keys(agency.metrics) : []
+  }, [sectionData, category])
+
+  // Get the selected entry
+  const entry = useMemo(() => {
+    if (!category || !metric) return null
+    if (sectionData) {
+      return sectionData[category]?.metrics[metric] || null
+    }
+    return AGENCIES[category]?.metrics[metric] || null
+  }, [sectionData, category, metric])
+
+  const years = useMemo(() => {
+    switch (section) {
+      case 'revenue': return RD_YEARS
+      case 'debt': return RD_YEARS
+      case 'demographics': return DM_YEARS
+      case 'financial': return FT_YEARS
+      default: return OP_YEARS
+    }
+  }, [section])
 
   const chartData = useMemo(() => {
     if (!entry) return []
-    return YEARS.map((yr, i) => ({ year: 'FY' + yr, value: entry.values[i] }))
-  }, [entry])
+    return years.map((yr, i) => ({ year: 'FY' + yr, value: entry.values[i] }))
+  }, [entry, years])
 
   const stats = useMemo(() => {
     if (!entry) return null
@@ -85,14 +164,14 @@ export default function OperatingIndicatorsChart() {
     const earliest = entry.values[0]
     const peak = Math.max(...vals)
     const trough = Math.min(...vals)
-    const peakYear = YEARS[entry.values.indexOf(peak)]
-    const troughYear = YEARS[entry.values.indexOf(trough)]
+    const peakYear = years[entry.values.indexOf(peak)]
+    const troughYear = years[entry.values.indexOf(trough)]
     let pctChange = null
     if (earliest !== null && earliest !== 0 && latest !== null) {
       pctChange = ((latest - earliest) / Math.abs(earliest)) * 100
     }
     return { latest, earliest, peak, trough, peakYear, troughYear, pctChange }
-  }, [entry])
+  }, [entry, years])
 
   const yDomain = useMemo(() => {
     const hasMin = customMin !== '' && !isNaN(Number(customMin))
@@ -106,77 +185,89 @@ export default function OperatingIndicatorsChart() {
     return startAtZero ? [0, 'auto'] : ['auto', 'auto']
   }, [startAtZero, customMin, customMax])
 
-  const handleAgencyChange = (e) => {
-    setAgency(e.target.value)
+  const handleSectionChange = (key) => {
+    setSection(key)
+    setCategory('')
     setMetric('')
     setCustomMin('')
     setCustomMax('')
   }
 
+  const handleCategoryChange = (e) => {
+    setCategory(e.target.value)
+    setMetric('')
+    setCustomMin('')
+    setCustomMax('')
+  }
+
+  // Subtitle for the category
+  const categoryLabel = isOperating ? 'Agency / Department' : 'Table / Schedule'
+  const yearRange = `FY${years[0]}\u2013FY${years[years.length - 1]}`
+
   return (
     <div>
-      {/* Controls */}
+      {/* Section pills */}
       <div style={{
-        display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 24,
+        display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap',
       }}>
-        <div style={{ flex: '1 1 220px', minWidth: 0 }}>
-          <label style={{
-            display: 'block', fontSize: 11, fontWeight: 600, textTransform: 'uppercase',
-            letterSpacing: '0.08em', color: 'rgba(255,255,255,0.4)', marginBottom: 6,
-            fontFamily: "'DM Sans', sans-serif",
-          }}>Agency / Department</label>
-          <select
-            value={agency}
-            onChange={handleAgencyChange}
+        {SECTIONS.map(s => (
+          <button
+            key={s.key}
+            onClick={() => handleSectionChange(s.key)}
             style={{
-              width: '100%', padding: '10px 12px', fontSize: 15,
-              background: 'rgba(255,255,255,0.06)', color: '#fff',
-              border: '1px solid rgba(255,255,255,0.15)', borderRadius: 8,
-              fontFamily: "'DM Sans', sans-serif", cursor: 'pointer',
-              appearance: 'none',
-              backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='2' fill='none'/%3E%3C/svg%3E\")",
-              backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center',
+              padding: '8px 16px', borderRadius: 8, border: 'none',
+              background: section === s.key ? '#BE5343' : 'rgba(255,255,255,0.06)',
+              color: section === s.key ? '#fff' : 'rgba(255,255,255,0.5)',
+              fontSize: 13, fontWeight: 600, cursor: 'pointer',
+              fontFamily: "'DM Sans', sans-serif", transition: 'all 0.2s',
             }}
           >
-            <option value="" style={{ background: '#0a0e17', color: '#888' }}>
-              Select an agency&hellip;
+            {s.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Dropdowns */}
+      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 24 }}>
+        <div style={{ flex: '1 1 220px', minWidth: 0 }}>
+          <label style={labelStyle}>{categoryLabel}</label>
+          <select value={category} onChange={handleCategoryChange} style={selectStyle}>
+            <option value="" style={optionMuted}>
+              {isOperating ? 'Select an agency\u2026' : 'Select a table\u2026'}
             </option>
-            {grouped.map(g => (
-              <optgroup key={g.category} label={g.category} style={{ background: '#0a0e17', color: '#ccc' }}>
-                {g.agencies.map(a => (
-                  <option key={a} value={a} style={{ background: '#0a0e17', color: '#fff' }}>{a}</option>
-                ))}
-              </optgroup>
-            ))}
+            {isOperating ? (
+              grouped.map(g => (
+                <optgroup key={g.category} label={g.category} style={{ background: '#0a0e17', color: '#ccc' }}>
+                  {g.agencies.map(a => (
+                    <option key={a} value={a} style={optionStyle}>{a}</option>
+                  ))}
+                </optgroup>
+              ))
+            ) : (
+              categoryOptions.map(t => (
+                <option key={t} value={t} style={optionStyle}>{t}</option>
+              ))
+            )}
           </select>
         </div>
         <div style={{ flex: '1 1 220px', minWidth: 0 }}>
-          <label style={{
-            display: 'block', fontSize: 11, fontWeight: 600, textTransform: 'uppercase',
-            letterSpacing: '0.08em', color: 'rgba(255,255,255,0.4)', marginBottom: 6,
-            fontFamily: "'DM Sans', sans-serif",
-          }}>Indicator</label>
+          <label style={labelStyle}>Indicator</label>
           <select
             value={metric}
             onChange={e => setMetric(e.target.value)}
-            disabled={!agency}
+            disabled={!category}
             style={{
-              width: '100%', padding: '10px 12px', fontSize: 15,
-              background: 'rgba(255,255,255,0.06)', color: agency ? '#fff' : 'rgba(255,255,255,0.3)',
-              border: '1px solid rgba(255,255,255,0.15)', borderRadius: 8,
-              fontFamily: "'DM Sans', sans-serif",
-              cursor: agency ? 'pointer' : 'not-allowed',
-              opacity: agency ? 1 : 0.5,
-              appearance: 'none',
-              backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='2' fill='none'/%3E%3C/svg%3E\")",
-              backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center',
+              ...selectStyle,
+              color: category ? '#fff' : 'rgba(255,255,255,0.3)',
+              cursor: category ? 'pointer' : 'not-allowed',
+              opacity: category ? 1 : 0.5,
             }}
           >
-            <option value="" style={{ background: '#0a0e17', color: '#888' }}>
-              {agency ? <>Select an indicator&hellip;</> : 'Pick an agency first'}
+            <option value="" style={optionMuted}>
+              {category ? 'Select an indicator\u2026' : 'Pick a category first'}
             </option>
-            {metrics.map(m => (
-              <option key={m} value={m} style={{ background: '#0a0e17', color: '#fff' }}>{m}</option>
+            {metricOptions.map(m => (
+              <option key={m} value={m} style={optionStyle}>{m}</option>
             ))}
           </select>
         </div>
@@ -194,7 +285,11 @@ export default function OperatingIndicatorsChart() {
             stroke="currentColor" strokeWidth="1.5" opacity="0.4">
             <path d="M3 3v18h18" /><path d="M7 16l4-8 4 4 5-9" />
           </svg>
-          <span style={{ fontSize: 15 }}>Pick an agency and indicator to see the trend</span>
+          <span style={{ fontSize: 15 }}>
+            {isOperating
+              ? 'Pick an agency and indicator to see the trend'
+              : 'Pick a table and indicator to see the trend'}
+          </span>
         </div>
       ) : (
         <>
@@ -209,7 +304,8 @@ export default function OperatingIndicatorsChart() {
               fontSize: 13, color: 'rgba(255,255,255,0.45)',
               fontFamily: "'DM Sans', sans-serif", marginTop: 2,
             }}>
-              {agency} &middot; FY2016&ndash;FY2025
+              {category} &middot; {yearRange}
+              {(section === 'financial' || section === 'revenue' || section === 'debt') && ' \u00b7 in thousands ($)'}
             </div>
           </div>
 
@@ -313,9 +409,9 @@ export default function OperatingIndicatorsChart() {
                   axisLine={false}
                   tickLine={false}
                   tickFormatter={formatNum}
-                  width={60}
+                  width={65}
                 />
-                <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(255,255,255,0.15)' }} />
+                <Tooltip content={<CustomTooltip dollarUnit={section === 'financial' || section === 'revenue' || section === 'debt'} />} cursor={{ stroke: 'rgba(255,255,255,0.15)' }} />
                 <Area
                   type="monotone"
                   dataKey="value"
@@ -340,7 +436,7 @@ export default function OperatingIndicatorsChart() {
             }}>
               <div style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'rgba(255,255,255,0.4)', fontWeight: 600 }}>
-                  Latest (FY2025)
+                  Latest (FY{years[years.length - 1]})
                 </div>
                 <div style={{ fontSize: 18, fontWeight: 700, color: '#fff', marginTop: 4 }}>
                   {formatFull(stats.latest)}
