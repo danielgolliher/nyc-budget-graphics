@@ -9,10 +9,10 @@ import { YEARS as RD_YEARS, REVENUE_CAPACITY, DEBT_CAPACITY } from '../data/reve
 import { YEARS as DM_YEARS, DEMOGRAPHICS } from '../data/demographics'
 
 const SECTIONS = [
-  { key: 'financial', label: 'Financial Trends' },
-  { key: 'revenue', label: 'Revenue Capacity' },
-  { key: 'debt', label: 'Debt Capacity' },
-  { key: 'demographics', label: 'Demographics & Economy' },
+  { key: 'financial', label: 'Financial Trends', hidden: true },
+  { key: 'revenue', label: 'Revenue Capacity', hidden: true },
+  { key: 'debt', label: 'Debt Capacity', hidden: true },
+  { key: 'demographics', label: 'Demographics & Economy', hidden: true },
   { key: 'operating', label: 'Operating Information' },
 ]
 
@@ -250,11 +250,12 @@ export default function OperatingIndicatorsChart() {
 
   return (
     <div>
-      {/* Section pills */}
+      {/* Section pills — hidden when only one visible */}
+      {SECTIONS.filter(s => !s.hidden).length > 1 && (
       <div style={{
         display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap',
       }}>
-        {SECTIONS.map(s => (
+        {SECTIONS.filter(s => !s.hidden).map(s => (
           <button
             key={s.key}
             onClick={() => handleSectionChange(s.key)}
@@ -270,6 +271,7 @@ export default function OperatingIndicatorsChart() {
           </button>
         ))}
       </div>
+      )}
 
       {/* Dropdowns */}
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 24 }}>
