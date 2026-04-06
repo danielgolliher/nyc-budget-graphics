@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 140">
+  <rect width="200" height="140" rx="4" fill="#0a0e17"/>
+  <rect width="200" height="3" fill="#BE5343"/>
+  <!-- Title -->
+  <text x="14" y="20" fill="#fff" font-size="7.5" font-family="Georgia, serif" opacity="0.9">Operating Indicators</text>
+  <text x="186" y="20" fill="rgba(255,255,255,0.35)" font-size="5.5" font-family="sans-serif" text-anchor="end">FY2016-2025</text>
+  <!-- Subtle grid -->
+  <line x1="24" y1="36" x2="178" y2="36" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
+  <line x1="24" y1="54" x2="178" y2="54" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
+  <line x1="24" y1="72" x2="178" y2="72" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
+  <line x1="24" y1="90" x2="178" y2="90" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
+  <!-- Area fill -->
+  <polygon
+    points="30,78 47,80 64,76 81,68 98,86 115,88 132,62 149,56 166,54 178,58 178,96 30,96"
+    fill="url(#previewGrad)" opacity="0.6"
+  />
+  <!-- Line -->
+  <polyline
+    points="30,78 47,80 64,76 81,68 98,86 115,88 132,62 149,56 166,54 178,58"
+    fill="none" stroke="#BE5343" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"
+  />
+  <!-- Dots -->
+  <circle cx="30" cy="78" r="2.5" fill="#BE5343" stroke="#0a0e17" stroke-width="1.5"/>
+  <circle cx="47" cy="80" r="2.5" fill="#BE5343" stroke="#0a0e17" stroke-width="1.5"/>
+  <circle cx="64" cy="76" r="2.5" fill="#BE5343" stroke="#0a0e17" stroke-width="1.5"/>
+  <circle cx="81" cy="68" r="2.5" fill="#BE5343" stroke="#0a0e17" stroke-width="1.5"/>
+  <circle cx="98" cy="86" r="2.5" fill="#BE5343" stroke="#0a0e17" stroke-width="1.5"/>
+  <circle cx="115" cy="88" r="2.5" fill="#BE5343" stroke="#0a0e17" stroke-width="1.5"/>
+  <circle cx="132" cy="62" r="2.5" fill="#BE5343" stroke="#0a0e17" stroke-width="1.5"/>
+  <circle cx="149" cy="56" r="2.5" fill="#BE5343" stroke="#0a0e17" stroke-width="1.5"/>
+  <circle cx="166" cy="54" r="2.5" fill="#BE5343" stroke="#0a0e17" stroke-width="1.5"/>
+  <circle cx="178" cy="58" r="2.5" fill="#BE5343" stroke="#0a0e17" stroke-width="1.5"/>
+  <!-- Dropdown hint -->
+  <rect x="14" y="108" width="60" height="14" rx="3" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="0.5"/>
+  <text x="20" y="118" fill="rgba(255,255,255,0.35)" font-size="5.5" font-family="sans-serif">Agency</text>
+  <rect x="80" y="108" width="60" height="14" rx="3" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="0.5"/>
+  <text x="86" y="118" fill="rgba(255,255,255,0.35)" font-size="5.5" font-family="sans-serif">Indicator</text>
+  <!-- Gradient def -->
+  <defs>
+    <linearGradient id="previewGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#BE5343" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#BE5343" stop-opacity="0.02"/>
+    </linearGradient>
+  </defs>
+  <!-- Source -->
+  <text x="100" y="134" fill="rgba(255,255,255,0.2)" font-size="4.5" font-family="sans-serif" text-anchor="middle">NYC Comptroller FY2025</text>
+</svg>

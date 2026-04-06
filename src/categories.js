@@ -71,6 +71,15 @@ const categories = [
     component: lazy(() => import('./pages/StateAdmissionPage')),
   },
   {
+    slug: 'operating-indicators',
+    label: 'NYC Operating Indicators',
+    navLabel: 'Operating Indicators',
+    description:
+      'Ten years of NYC agency performance data — crime, fire response, shelter counts, parks attendance, and more.',
+    preview: 'previews/operating-indicators.svg',
+    component: lazy(() => import('./pages/OperatingIndicatorsPage')),
+  },
+  {
     slug: 'nyc-tax-rate',
     label: 'NYS-NYC Tax Rate',
     navLabel: 'Tax Rate',
