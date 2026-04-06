@@ -56,9 +56,43 @@ function getGroupedAgencies() {
     .filter(g => g.agencies.length > 0)
 }
 
-function CustomTooltip({ active, payload, label, dollarUnit }) {
+// Convert a raw number + unit into a human-readable string like "$86.2 billion"
+function humanReadable(n, unit) {
+  if (n === null || n === undefined) return null
+  const abs = Math.abs(n)
+
+  // Determine the multiplier to get actual dollars
+  let actualValue = n
+  let isDollar = false
+  if (unit && unit.includes('thousands ($)')) {
+    actualValue = n * 1000
+    isDollar = true
+  } else if (unit && unit.includes('millions ($)')) {
+    actualValue = n * 1000000
+    isDollar = true
+  }
+
+  if (isDollar) {
+    const absActual = Math.abs(actualValue)
+    const sign = actualValue < 0 ? '-' : ''
+    if (absActual >= 1e12) return sign + '$' + (absActual / 1e12).toFixed(1) + ' trillion'
+    if (absActual >= 1e9) return sign + '$' + (absActual / 1e9).toFixed(1) + ' billion'
+    if (absActual >= 1e6) return sign + '$' + (absActual / 1e6).toFixed(1) + ' million'
+    if (absActual >= 1e3) return sign + '$' + (absActual / 1e3).toFixed(0) + ' thousand'
+    return sign + '$' + absActual.toFixed(0)
+  }
+
+  // Non-dollar: just show a rounded human-readable version for large numbers
+  if (abs >= 1e9) return (n / 1e9).toFixed(1) + ' billion'
+  if (abs >= 1e6) return (n / 1e6).toFixed(1) + ' million'
+  if (abs >= 1e4) return (n / 1e3).toFixed(0) + ' thousand'
+  return null // No summary needed for small numbers
+}
+
+function CustomTooltip({ active, payload, label, unit }) {
   if (!active || !payload?.length) return null
   const v = payload[0].value
+  const readable = humanReadable(v, unit)
   return (
     <div style={{
       background: '#0f1729', border: '1px solid rgba(255,255,255,0.12)',
@@ -68,9 +102,13 @@ function CustomTooltip({ active, payload, label, dollarUnit }) {
         {label}
       </div>
       <div style={{ fontSize: 18, fontWeight: 700, color: '#fff' }}>
-        {dollarUnit ? '$' : ''}{formatFull(v)}
-        {dollarUnit ? ' (thousands)' : ''}
+        {formatFull(v)}
       </div>
+      {readable && (
+        <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', marginTop: 2 }}>
+          {readable}
+        </div>
+      )}
     </div>
   )
 }
@@ -131,6 +169,12 @@ export default function OperatingIndicatorsChart() {
     }
     const agency = AGENCIES[category]
     return agency ? Object.keys(agency.metrics) : []
+  }, [sectionData, category])
+
+  // Get the unit for the selected table
+  const tableUnit = useMemo(() => {
+    if (!category || !sectionData) return null
+    return sectionData[category]?.unit || null
   }, [sectionData, category])
 
   // Get the selected entry
@@ -305,7 +349,7 @@ export default function OperatingIndicatorsChart() {
               fontFamily: "'DM Sans', sans-serif", marginTop: 2,
             }}>
               {category} &middot; {yearRange}
-              {(section === 'financial' || section === 'revenue' || section === 'debt') && ' \u00b7 in thousands ($)'}
+              {tableUnit && ` \u00b7 ${tableUnit}`}
             </div>
           </div>
 
@@ -411,7 +455,7 @@ export default function OperatingIndicatorsChart() {
                   tickFormatter={formatNum}
                   width={65}
                 />
-                <Tooltip content={<CustomTooltip dollarUnit={section === 'financial' || section === 'revenue' || section === 'debt'} />} cursor={{ stroke: 'rgba(255,255,255,0.15)' }} />
+                <Tooltip content={<CustomTooltip unit={tableUnit} />} cursor={{ stroke: 'rgba(255,255,255,0.15)' }} />
                 <Area
                   type="monotone"
                   dataKey="value"

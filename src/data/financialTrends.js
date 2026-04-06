@@ -7,6 +7,7 @@ export const YEARS = [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025
 
 export const FINANCIAL_TRENDS = {
   'Net Position': {
+    unit: 'thousands ($)',
     metrics: {
       'Total governmental net position': {
         values: [-193524916, -194436241, -197767704, -201916160, -205835836, -196468072, -194672684, -191211382, -198095960, -196088606],
@@ -36,6 +37,7 @@ export const FINANCIAL_TRENDS = {
     },
   },
   'Expenses by Function': {
+    unit: 'thousands ($)',
     metrics: {
       'General government': {
         values: [5259894, 5360092, 6525142, 6547234, 6840460, 8196762, 6095409, 3873117, 10134809, 9186394],
@@ -82,6 +84,7 @@ export const FINANCIAL_TRENDS = {
     },
   },
   'Program Revenues': {
+    unit: 'thousands ($)',
     metrics: {
       'Charges for services: Governmental': {
         values: [4786001, 4919609, 4836215, 5700901, 5729258, 5664655, 5258758, 5760252, 5872817, 6342716],
@@ -101,6 +104,7 @@ export const FINANCIAL_TRENDS = {
     },
   },
   'General Revenues (Taxes)': {
+    unit: 'thousands ($)',
     metrics: {
       'Real estate taxes': {
         values: [23171276, 24586758, 26301276, 28080534, 29617805, 31421372, 29507123, 31501534, 32924515, 34479000],
@@ -132,6 +136,7 @@ export const FINANCIAL_TRENDS = {
     },
   },
   'Net Position Changes': {
+    unit: 'thousands ($)',
     metrics: {
       'Governmental activities change': {
         values: [-5917150, -911325, -3331463, -6946149, -3919676, 9367764, 10081212, 3462991, -6884578, -471219],
@@ -145,6 +150,7 @@ export const FINANCIAL_TRENDS = {
     },
   },
   'Fund Balances': {
+    unit: 'thousands ($)',
     metrics: {
       'Total Fund Balances (Deficit)': {
         values: [3543823, 4069507, 5418104, 6188529, 7008431, 7740346, 7594552, 5573068, 3457868, 5918851],
@@ -164,6 +170,7 @@ export const FINANCIAL_TRENDS = {
     },
   },
   'Fund Revenues': {
+    unit: 'thousands ($)',
     metrics: {
       'Real estate taxes': {
         values: [23180583, 24679411, 26407630, 27884735, 29815935, 31464469, 29582214, 31644665, 32987024, 34756900],
@@ -195,6 +202,7 @@ export const FINANCIAL_TRENDS = {
     },
   },
   'Fund Expenditures': {
+    unit: 'thousands ($)',
     metrics: {
       'General government': {
         values: [3711176, 4035883, 4356702, 4385253, 3961873, 5313086, 5284573, 5794908, 6286459, 6580183],
@@ -232,6 +240,7 @@ export const FINANCIAL_TRENDS = {
     },
   },
   'Fund Balance Summary': {
+    unit: 'thousands ($)',
     metrics: {
       'Total revenues': {
         values: [82340995, 85837344, 90568846, 95041797, 98235620, 104151144, 109744201, 110943170, 115782787, 121096241],

@@ -6,6 +6,7 @@ export const YEARS = [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025
 
 export const REVENUE_CAPACITY = {
   'Property Tax Rates': {
+    unit: 'rate (per $100 assessed)',
     metrics: {
       'Basic rate (per $100 assessed)': {
         values: [11.59, 11.69, 11.80, 12.15, 12.11, 11.79, 12.46, 12.50, 12.46, 11.98],
@@ -20,6 +21,7 @@ export const REVENUE_CAPACITY = {
     },
   },
   'Assessed Valuation': {
+    unit: 'millions ($)',
     metrics: {
       'Class One (residential, in millions)': {
         values: [17727.5, 18394.0, 19442.8, 20146.8, 21042.9, 22018.2, 22801.5, 23699.0, 24894.7, 25834.4],
@@ -48,6 +50,7 @@ export const REVENUE_CAPACITY = {
     },
   },
   'Property Tax Collections': {
+    unit: 'millions ($) / percent',
     metrics: {
       'Tax levy (millions)': {
         values: [24145.0, 25794.0, 27726.0, 29575.0, 31630.0, 33371.0, 31636.0, 33853.0, 35340.0, 36862.0],
@@ -67,6 +70,7 @@ export const REVENUE_CAPACITY = {
     },
   },
   'General Fund Expenditures': {
+    unit: 'thousands ($)',
     metrics: {
       'Total General Government': {
         values: [2985013, 3246561, 3494774, 3436484, 4541574, 4429366, 4225605, 4388563, 4793947, 5111504],
@@ -123,6 +127,7 @@ export const REVENUE_CAPACITY = {
     },
   },
   'Capital Projects Fund': {
+    unit: 'thousands ($)',
     metrics: {
       'Total Capital Expenditures': {
         values: [8079916, 8825550, 9639737, 10848283, 9773792, 9431236, 10529999, 12149728, 14524464, 15578006],
@@ -158,6 +163,7 @@ export const REVENUE_CAPACITY = {
 
 export const DEBT_CAPACITY = {
   'Outstanding Debt': {
+    unit: 'millions ($)',
     metrics: {
       'General Obligation Bonds (millions)': {
         values: [38073, 37891, 38628, 37519, 38784, 38574, 38845, 40093, 41701, 46721],
@@ -179,6 +185,7 @@ export const DEBT_CAPACITY = {
     },
   },
   'Bonded Debt Ratios': {
+    unit: 'millions ($) / percent / per capita',
     metrics: {
       'Total Primary Government debt (millions)': {
         values: [87812, 91172, 95046, 97083, 101001, 101040, 116497, 118090, 123588, 133639],
@@ -201,6 +208,7 @@ export const DEBT_CAPACITY = {
     },
   },
   'Legal Debt Margin': {
+    unit: 'thousands ($) / percent',
     metrics: {
       'Assessed value (thousands)': {
         values: [851841382, 902361491, 982414504, 1062428933, 1162656654, 1230177675, 1273521200, 1274475176, 1316433048, 1367549131],
@@ -217,6 +225,7 @@ export const DEBT_CAPACITY = {
     },
   },
   'Parking & ECB Fines': {
+    unit: 'thousands ($) / millions ($)',
     metrics: {
       'Parking fines: Summonses issued (thousands)': {
         values: [966, 901, 994, 984, 753, 764, 880, 1159, 1028, 1088],

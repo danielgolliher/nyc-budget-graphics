@@ -10,6 +10,7 @@ export const YEARS = [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025
 
 export const DEMOGRAPHICS = {
   'Population': {
+    unit: 'count',
     metrics: {
       'New York City population': {
         values: [8794592, 8815395, 8826377, 8824751, 8740292, 8462216, 8335798, 8258035, 8478072, null],
@@ -25,6 +26,7 @@ export const DEMOGRAPHICS = {
     },
   },
   'Population by Borough': {
+    unit: 'count',
     metrics: {
       'Bronx (2024 est.)': {
         values: [null, null, null, null, null, null, null, null, 1384724, null],
@@ -45,6 +47,7 @@ export const DEMOGRAPHICS = {
     },
   },
   'Personal Income': {
+    unit: 'thousands ($) / dollars',
     metrics: {
       'NYC personal income (thousands)': {
         values: [547280011, 593152562, 614288176, 627414838, 650034036, 696440050, 704094853, 744453492, null, null],
@@ -62,6 +65,7 @@ export const DEMOGRAPHICS = {
     },
   },
   'Employment by Sector': {
+    unit: 'thousands',
     metrics: {
       'Services (thousands)': {
         values: [2471, 2548, 2626, 2712, 2367, 2462, 2709, 2805, 2901, 2950],
@@ -97,6 +101,7 @@ export const DEMOGRAPHICS = {
     },
   },
   'Unemployment': {
+    unit: 'percent / thousands',
     metrics: {
       'NYC unemployment rate (%)': {
         values: [5.2, 4.5, 4.2, 4.0, 12.4, 10.1, 5.7, 5.0, 5.3, null],
@@ -114,6 +119,7 @@ export const DEMOGRAPHICS = {
     },
   },
   'Public Assistance': {
+    unit: 'thousands / count',
     metrics: {
       'Public assistance recipients (thousands)': {
         values: [370, 364, 356, 332, 378, 371, 425, 481, 558, 601],
@@ -126,6 +132,7 @@ export const DEMOGRAPHICS = {
     },
   },
   'City Full-Time Employees': {
+    unit: 'count',
     metrics: {
       'Total full-time employees': {
         values: [287002, 295455, 298370, 300442, 300446, 291101, 282498, 281917, 283971, 287422],
