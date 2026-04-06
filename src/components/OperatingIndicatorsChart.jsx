@@ -65,6 +65,9 @@ function CustomTooltip({ active, payload, label }) {
 export default function OperatingIndicatorsChart() {
   const [agency, setAgency] = useState('')
   const [metric, setMetric] = useState('')
+  const [startAtZero, setStartAtZero] = useState(false)
+  const [customMin, setCustomMin] = useState('')
+  const [customMax, setCustomMax] = useState('')
 
   const grouped = useMemo(getGroupedAgencies, [])
   const metrics = agency ? Object.keys(AGENCIES[agency].metrics) : []
@@ -91,9 +94,23 @@ export default function OperatingIndicatorsChart() {
     return { latest, earliest, peak, trough, peakYear, troughYear, pctChange }
   }, [entry])
 
+  const yDomain = useMemo(() => {
+    const hasMin = customMin !== '' && !isNaN(Number(customMin))
+    const hasMax = customMax !== '' && !isNaN(Number(customMax))
+    if (hasMin || hasMax) {
+      return [
+        hasMin ? Number(customMin) : (startAtZero ? 0 : 'auto'),
+        hasMax ? Number(customMax) : 'auto',
+      ]
+    }
+    return startAtZero ? [0, 'auto'] : ['auto', 'auto']
+  }, [startAtZero, customMin, customMax])
+
   const handleAgencyChange = (e) => {
     setAgency(e.target.value)
     setMetric('')
+    setCustomMin('')
+    setCustomMax('')
   }
 
   return (
@@ -122,7 +139,7 @@ export default function OperatingIndicatorsChart() {
             }}
           >
             <option value="" style={{ background: '#0a0e17', color: '#888' }}>
-              Select an agency\u2026
+              Select an agency&hellip;
             </option>
             {grouped.map(g => (
               <optgroup key={g.category} label={g.category} style={{ background: '#0a0e17', color: '#ccc' }}>
@@ -156,7 +173,7 @@ export default function OperatingIndicatorsChart() {
             }}
           >
             <option value="" style={{ background: '#0a0e17', color: '#888' }}>
-              {agency ? 'Select an indicator\u2026' : 'Pick an agency first'}
+              {agency ? <>Select an indicator&hellip;</> : 'Pick an agency first'}
             </option>
             {metrics.map(m => (
               <option key={m} value={m} style={{ background: '#0a0e17', color: '#fff' }}>{m}</option>
@@ -192,7 +209,80 @@ export default function OperatingIndicatorsChart() {
               fontSize: 13, color: 'rgba(255,255,255,0.45)',
               fontFamily: "'DM Sans', sans-serif", marginTop: 2,
             }}>
-              {agency} &middot; FY2016\u2013FY2025
+              {agency} &middot; FY2016&ndash;FY2025
+            </div>
+          </div>
+
+          {/* Y-axis controls */}
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap',
+            marginBottom: 16, fontFamily: "'DM Sans', sans-serif",
+          }}>
+            <button
+              onClick={() => { setStartAtZero(!startAtZero); setCustomMin(''); setCustomMax('') }}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 8,
+                padding: '6px 12px', borderRadius: 6, border: 'none',
+                background: startAtZero ? 'rgba(190,83,67,0.2)' : 'rgba(255,255,255,0.06)',
+                color: startAtZero ? '#e8a89e' : 'rgba(255,255,255,0.5)',
+                fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                fontFamily: "'DM Sans', sans-serif", transition: 'all 0.2s',
+              }}
+            >
+              <span style={{
+                display: 'inline-block', width: 28, height: 16, borderRadius: 8,
+                background: startAtZero ? '#BE5343' : 'rgba(255,255,255,0.15)',
+                position: 'relative', transition: 'background 0.2s',
+              }}>
+                <span style={{
+                  position: 'absolute', top: 2, left: startAtZero ? 14 : 2,
+                  width: 12, height: 12, borderRadius: '50%', background: '#fff',
+                  transition: 'left 0.2s', boxShadow: '0 1px 2px rgba(0,0,0,0.3)',
+                }} />
+              </span>
+              Start at zero
+            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                Y-axis
+              </span>
+              <input
+                type="number"
+                placeholder="Min"
+                value={customMin}
+                onChange={e => { setCustomMin(e.target.value); if (e.target.value !== '') setStartAtZero(false) }}
+                style={{
+                  width: 72, padding: '5px 8px', fontSize: 13,
+                  background: 'rgba(255,255,255,0.06)', color: '#fff',
+                  border: '1px solid rgba(255,255,255,0.12)', borderRadius: 6,
+                  fontFamily: "'DM Sans', sans-serif",
+                }}
+              />
+              <span style={{ color: 'rgba(255,255,255,0.2)' }}>&ndash;</span>
+              <input
+                type="number"
+                placeholder="Max"
+                value={customMax}
+                onChange={e => { setCustomMax(e.target.value) }}
+                style={{
+                  width: 72, padding: '5px 8px', fontSize: 13,
+                  background: 'rgba(255,255,255,0.06)', color: '#fff',
+                  border: '1px solid rgba(255,255,255,0.12)', borderRadius: 6,
+                  fontFamily: "'DM Sans', sans-serif",
+                }}
+              />
+              {(customMin !== '' || customMax !== '') && (
+                <button
+                  onClick={() => { setCustomMin(''); setCustomMax('') }}
+                  style={{
+                    background: 'none', border: 'none', color: 'rgba(255,255,255,0.35)',
+                    cursor: 'pointer', fontSize: 14, padding: '2px 4px',
+                  }}
+                  title="Reset"
+                >
+                  &times;
+                </button>
+              )}
             </div>
           </div>
 
@@ -217,6 +307,8 @@ export default function OperatingIndicatorsChart() {
                   tickLine={false}
                 />
                 <YAxis
+                  domain={yDomain}
+                  allowDataOverflow={customMin !== '' || customMax !== ''}
                   tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 12, fontFamily: "'DM Sans', sans-serif" }}
                   axisLine={false}
                   tickLine={false}
