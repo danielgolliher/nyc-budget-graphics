@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 140">
+  <rect width="200" height="140" fill="#0a0a1a"/>
+  <!-- Manhattan outline -->
+  <path d="M105,20 L112,15 L118,18 L120,30 L122,50 L120,70 L118,85 L115,95 L110,105 L105,115 L100,120 L98,115 L95,100 L93,85 L92,70 L93,50 L95,35 L100,25 Z" fill="#c0392b" opacity="0.6"/>
+  <!-- Water -->
+  <rect x="80" y="10" width="50" height="125" rx="3" fill="none" stroke="#1a4a6c" stroke-width="0.5"/>
+  <!-- Character -->
+  <rect x="106" y="70" width="6" height="8" fill="#3366cc" rx="1"/>
+  <rect x="107" y="66" width="4" height="4" fill="#d4a574" rx="1"/>
+  <!-- NPC -->
+  <rect x="114" y="50" width="6" height="8" fill="#d35400" rx="1"/>
+  <rect x="115" y="46" width="4" height="4" fill="#d4a574" rx="1"/>
+  <circle cx="117" cy="42" r="3" fill="#ffff00" opacity="0.8"/>
+  <text x="117" y="44" font-size="5" fill="#000" text-anchor="middle" font-weight="bold">!</text>
+  <!-- Title -->
+  <text x="100" y="138" font-family="monospace" font-size="7" fill="#ffd700" text-anchor="middle" font-weight="bold">NYC COUNCIL QUEST</text>
+</svg>
