@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 140">
+  <rect width="200" height="140" rx="4" fill="#0a0e17"/>
+  <!-- Title -->
+  <text x="14" y="18" fill="#e2e8f0" font-size="7.5" font-family="Georgia, serif">NYC Pedestrian Traffic</text>
+  <text x="186" y="18" fill="#64748b" font-size="5.5" font-family="sans-serif" text-anchor="end">315K segments</text>
+  <!-- Simplified street grid representing Manhattan -->
+  <!-- Low traffic (dark blue) -->
+  <line x1="30" y1="30" x2="30" y2="120" stroke="rgba(25,70,130,0.5)" stroke-width="0.8"/>
+  <line x1="45" y1="30" x2="45" y2="120" stroke="rgba(25,70,130,0.5)" stroke-width="0.8"/>
+  <line x1="60" y1="30" x2="60" y2="120" stroke="rgba(25,70,130,0.5)" stroke-width="0.8"/>
+  <line x1="75" y1="30" x2="75" y2="120" stroke="rgba(30,110,190,0.65)" stroke-width="1"/>
+  <line x1="90" y1="30" x2="90" y2="120" stroke="rgba(30,110,190,0.65)" stroke-width="1"/>
+  <line x1="105" y1="30" x2="105" y2="120" stroke="rgba(25,70,130,0.5)" stroke-width="0.8"/>
+  <line x1="120" y1="30" x2="120" y2="120" stroke="rgba(25,70,130,0.5)" stroke-width="0.8"/>
+  <line x1="135" y1="30" x2="135" y2="120" stroke="rgba(20,40,80,0.4)" stroke-width="0.6"/>
+  <line x1="150" y1="30" x2="150" y2="120" stroke="rgba(20,40,80,0.4)" stroke-width="0.6"/>
+  <line x1="165" y1="30" x2="165" y2="120" stroke="rgba(20,40,80,0.4)" stroke-width="0.6"/>
+  <!-- Cross streets -->
+  <line x1="20" y1="40" x2="180" y2="40" stroke="rgba(25,70,130,0.5)" stroke-width="0.8"/>
+  <line x1="20" y1="55" x2="180" y2="55" stroke="rgba(25,70,130,0.5)" stroke-width="0.8"/>
+  <line x1="20" y1="70" x2="180" y2="70" stroke="rgba(30,110,190,0.65)" stroke-width="1"/>
+  <line x1="20" y1="85" x2="180" y2="85" stroke="rgba(25,70,130,0.5)" stroke-width="0.8"/>
+  <line x1="20" y1="100" x2="180" y2="100" stroke="rgba(25,70,130,0.5)" stroke-width="0.8"/>
+  <line x1="20" y1="115" x2="180" y2="115" stroke="rgba(20,40,80,0.4)" stroke-width="0.6"/>
+  <!-- High traffic highlights (yellow/orange/red) -->
+  <line x1="75" y1="55" x2="75" y2="85" stroke="rgba(249,168,37,0.9)" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="90" y1="40" x2="90" y2="85" stroke="rgba(255,111,0,0.92)" stroke-width="3" stroke-linecap="round"/>
+  <line x1="60" y1="70" x2="120" y2="70" stroke="rgba(229,57,53,0.95)" stroke-width="3.5" stroke-linecap="round"/>
+  <line x1="75" y1="55" x2="105" y2="55" stroke="rgba(33,150,243,0.8)" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="60" y1="85" x2="105" y2="85" stroke="rgba(249,168,37,0.9)" stroke-width="2" stroke-linecap="round"/>
+  <line x1="105" y1="55" x2="105" y2="85" stroke="rgba(100,180,60,0.85)" stroke-width="1.8" stroke-linecap="round"/>
+  <!-- Legend bar -->
+  <rect x="20" y="126" width="120" height="5" rx="2.5" fill="url(#lg)"/>
+  <defs>
+    <linearGradient id="lg" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#1a1a2e"/>
+      <stop offset="25%" stop-color="#1e6091"/>
+      <stop offset="50%" stop-color="#2196f3"/>
+      <stop offset="65%" stop-color="#66bb6a"/>
+      <stop offset="80%" stop-color="#f9a825"/>
+      <stop offset="100%" stop-color="#e53935"/>
+    </linearGradient>
+  </defs>
+  <text x="20" y="124" fill="#64748b" font-size="4" font-family="sans-serif">Low</text>
+  <text x="140" y="124" fill="#64748b" font-size="4" font-family="sans-serif" text-anchor="end">High</text>
+  <text x="186" y="134" fill="#475569" font-size="4" font-family="sans-serif" text-anchor="end">MIT City Form Lab</text>
+</svg>

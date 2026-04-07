@@ -88,6 +88,24 @@ const categories = [
     preview: 'previews/tax-rate.svg',
     component: lazy(() => import('./pages/TaxRatePage')),
   },
+  {
+    slug: 'seqra-battle',
+    label: 'HOUSE vs. SEQRA',
+    navLabel: 'SEQRA Battle',
+    description:
+      'A Pokémon-style battle between New York housing and the State Environmental Quality Review Act.',
+    preview: 'previews/seqra-battle.svg',
+    component: lazy(() => import('./pages/SeqraBattlePage')),
+  },
+  {
+    slug: 'pedestrian-traffic',
+    label: 'NYC Pedestrian Traffic',
+    navLabel: 'Pedestrian Traffic',
+    description:
+      'Estimated peak-period pedestrian volumes across every sidewalk and crosswalk in all five NYC boroughs.',
+    preview: 'previews/pedestrian-traffic.svg',
+    component: lazy(() => import('./pages/PedestrianTrafficPage')),
+  },
 ]
 
 export default categories
