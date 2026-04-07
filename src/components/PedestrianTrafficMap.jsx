@@ -55,6 +55,8 @@ export default function PedestrianTrafficMap() {
   const [loading, setLoading] = useState(true)
   const [loadMsg, setLoadMsg] = useState('Downloading data...')
   const [segCount, setSegCount] = useState(0)
+  const [fullScreen, setFullScreen] = useState(false)
+  const containerRef = useRef(null)
 
   // Keep refs in sync with state
   useEffect(() => { dayRef.current = currentDay }, [currentDay])
@@ -240,6 +242,26 @@ export default function PedestrianTrafficMap() {
     }
   }, [currentDay, currentTime])
 
+  // Invalidate map size when fullscreen toggles
+  useEffect(() => {
+    if (mapInstance.current) {
+      setTimeout(() => {
+        mapInstance.current.invalidateSize()
+        if (canvasLayerRef.current && segmentsRef.current) {
+          canvasLayerRef.current.redraw()
+        }
+      }, 50)
+    }
+  }, [fullScreen])
+
+  // Escape key exits fullscreen
+  useEffect(() => {
+    if (!fullScreen) return
+    const handler = (e) => { if (e.key === 'Escape') setFullScreen(false) }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [fullScreen])
+
   const days = [
     { value: 'wd', label: 'Weekday' },
     { value: 'we', label: 'Weekend' },
@@ -251,8 +273,17 @@ export default function PedestrianTrafficMap() {
   ]
 
   return (
-    <div style={{ position: 'relative', width: '100%', borderRadius: 8, overflow: 'hidden' }}>
-      <div ref={mapRef} style={{ width: '100%', height: 600, background: '#0a0a0a' }} />
+    <div ref={containerRef} style={{
+      position: fullScreen ? 'fixed' : 'relative',
+      top: fullScreen ? 0 : undefined,
+      left: fullScreen ? 0 : undefined,
+      width: fullScreen ? '100vw' : '100%',
+      height: fullScreen ? '100vh' : undefined,
+      zIndex: fullScreen ? 9999 : undefined,
+      borderRadius: fullScreen ? 0 : 8,
+      overflow: 'hidden',
+    }}>
+      <div ref={mapRef} style={{ width: '100%', height: fullScreen ? '100vh' : 600, background: '#0a0a0a' }} />
 
       {/* Controls overlay */}
       <div style={{
@@ -296,6 +327,31 @@ export default function PedestrianTrafficMap() {
           </div>
         </div>
       </div>
+
+      {/* Full Screen toggle */}
+      <button onClick={() => setFullScreen(f => !f)} style={{
+        position: 'absolute', bottom: 16, right: 16, zIndex: 1000,
+        background: 'rgba(15,15,20,0.92)', backdropFilter: 'blur(12px)',
+        border: '1px solid rgba(255,255,255,0.12)', borderRadius: 6,
+        padding: '7px 12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
+        color: '#ccc', fontSize: 12, fontWeight: 500,
+        fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
+      }}>
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          {fullScreen ? (
+            <>
+              <polyline points="5,1 1,1 1,5" /><polyline points="9,13 13,13 13,9" />
+              <polyline points="13,5 13,1 9,1" /><polyline points="1,9 1,13 5,13" />
+            </>
+          ) : (
+            <>
+              <polyline points="1,5 1,1 5,1" /><polyline points="13,9 13,13 9,13" />
+              <polyline points="9,1 13,1 13,5" /><polyline points="5,13 1,13 1,9" />
+            </>
+          )}
+        </svg>
+        {fullScreen ? 'Exit Full Screen' : 'Full Screen'}
+      </button>
 
       {/* Loading overlay */}
       {loading && (
