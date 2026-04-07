@@ -105,6 +105,7 @@ const categories = [
       "Walk Manhattan's council districts in a retro 2D game. Meet your representatives, explore legislation, and email their offices.",
     preview: 'previews/council-quest.svg',
     component: lazy(() => import('./pages/CouncilQuestPage')),
+    comingSoon: true,
   },
   {
     slug: 'pedestrian-traffic',

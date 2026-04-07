@@ -721,6 +721,16 @@ a:hover {
   box-shadow: 0 4px 12px rgba(27,42,74,0.08);
   color: inherit;
 }
+.category-card.coming-soon {
+  opacity: 0.5;
+  filter: grayscale(0.7);
+  cursor: default;
+  pointer-events: auto;
+}
+.category-card.coming-soon:hover {
+  border-color: #ccc;
+  box-shadow: none;
+}
 
 .card-preview {
   width: 100%;

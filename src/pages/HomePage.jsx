@@ -12,15 +12,21 @@ export default function HomePage() {
       </div>
 
       <div className="category-grid">
-        {categories.map(({ slug, label, description, preview }) => (
-          <Link key={slug} to={`/${slug}`} className="category-card">
+        {categories.map(({ slug, label, description, preview, comingSoon }) => (
+          <Link key={slug} to={comingSoon ? '#' : `/${slug}`} className={`category-card${comingSoon ? ' coming-soon' : ''}`}
+            onClick={comingSoon ? (e) => e.preventDefault() : undefined}
+          >
             {preview && (
               <div className="card-preview">
                 <img src={import.meta.env.BASE_URL + preview} alt="" />
               </div>
             )}
             <div className="card-text">
-              <h2>{label}</h2>
+              <h2>{label}{comingSoon && <span style={{
+                marginLeft: 10, fontSize: 12, fontWeight: 700,
+                color: '#ffd700', background: 'rgba(255,215,0,0.15)',
+                padding: '2px 10px', borderRadius: 12, verticalAlign: 'middle',
+              }}>Coming soon!</span>}</h2>
               <p>{description}</p>
             </div>
           </Link>
