@@ -23,10 +23,12 @@ export default function HomePage() {
             )}
             <div className="card-text">
               <h2>{label}{comingSoon && <span style={{
-                marginLeft: 10, fontSize: 12, fontWeight: 700,
-                color: '#ffd700', background: 'rgba(255,215,0,0.15)',
-                padding: '2px 10px', borderRadius: 12, verticalAlign: 'middle',
-              }}>Coming soon!</span>}</h2>
+                marginLeft: 10, fontSize: 13, fontWeight: 900,
+                color: '#fff', background: 'linear-gradient(135deg, #d4a017, #ffd700)',
+                padding: '3px 14px', borderRadius: 12, verticalAlign: 'middle',
+                textTransform: 'uppercase', letterSpacing: '0.5px',
+                boxShadow: '0 2px 6px rgba(212,160,23,0.3)',
+              }}>Coming Soon!</span>}</h2>
               <p>{description}</p>
             </div>
           </Link>
