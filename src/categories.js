@@ -98,6 +98,15 @@ const categories = [
     component: lazy(() => import('./pages/SeqraBattlePage')),
   },
   {
+    slug: 'council-quest',
+    label: 'NYC Council Quest',
+    navLabel: 'Council Quest',
+    description:
+      "Walk Manhattan's council districts in a retro 2D game. Meet your representatives, explore legislation, and email their offices.",
+    preview: 'previews/council-quest.svg',
+    component: lazy(() => import('./pages/CouncilQuestPage')),
+  },
+  {
     slug: 'pedestrian-traffic',
     label: 'NYC Pedestrian Traffic',
     navLabel: 'Pedestrian Traffic',
