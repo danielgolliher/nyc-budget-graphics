@@ -722,10 +722,15 @@ a:hover {
   color: inherit;
 }
 .category-card.coming-soon {
-  opacity: 0.5;
-  filter: grayscale(0.7);
   cursor: default;
   pointer-events: auto;
+}
+.category-card.coming-soon .card-preview {
+  opacity: 0.4;
+  filter: grayscale(0.8);
+}
+.category-card.coming-soon .card-text p {
+  opacity: 0.5;
 }
 .category-card.coming-soon:hover {
   border-color: #ccc;

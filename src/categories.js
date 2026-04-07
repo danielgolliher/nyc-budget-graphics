@@ -103,7 +103,7 @@ const categories = [
     navLabel: 'Council Quest',
     description:
       "Walk Manhattan's council districts in a retro 2D game. Meet your representatives, explore legislation, and email their offices.",
-    preview: 'previews/council-quest.svg',
+    preview: 'previews/council-quest.jpg',
     component: lazy(() => import('./pages/CouncilQuestPage')),
     comingSoon: true,
   },

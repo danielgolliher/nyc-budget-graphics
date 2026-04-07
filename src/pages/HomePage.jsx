@@ -22,12 +22,11 @@ export default function HomePage() {
               </div>
             )}
             <div className="card-text">
-              <h2>{label}{comingSoon && <span style={{
-                marginLeft: 10, fontSize: 13, fontWeight: 900,
-                color: '#fff', background: 'linear-gradient(135deg, #d4a017, #ffd700)',
-                padding: '3px 14px', borderRadius: 12, verticalAlign: 'middle',
-                textTransform: 'uppercase', letterSpacing: '0.5px',
-                boxShadow: '0 2px 6px rgba(212,160,23,0.3)',
+              <h2 style={comingSoon ? {display:'flex',alignItems:'center',gap:10,flexWrap:'nowrap'} : undefined}>{label}{comingSoon && <span style={{
+                flexShrink: 0, fontSize: 11, fontWeight: 800,
+                color: '#fff', background: '#d4a017',
+                padding: '2px 10px', borderRadius: 20, whiteSpace: 'nowrap',
+                filter: 'none', opacity: 1,
               }}>Coming Soon!</span>}</h2>
               <p>{description}</p>
             </div>
