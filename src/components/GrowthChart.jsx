@@ -237,7 +237,7 @@ export default function GrowthChart() {
     <div
       style={{
         color: "#fff",
-        fontFamily: "'IBM Plex Sans', -apple-system, sans-serif",
+        fontFamily: "'DM Sans', -apple-system, sans-serif",
         boxSizing: "border-box",
       }}
     >
@@ -387,7 +387,7 @@ export default function GrowthChart() {
               fontSize: 14,
               fontWeight: 500,
               cursor: "pointer",
-              fontFamily: "'IBM Plex Sans', sans-serif",
+              fontFamily: "'DM Sans', sans-serif",
               transition: "all 0.2s",
               letterSpacing: 0.3,
             }}

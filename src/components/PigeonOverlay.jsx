@@ -118,15 +118,10 @@ export default function PigeonOverlay({ active }) {
     return () => {
       window.removeEventListener('resize', resize)
       if (animRef.current) cancelAnimationFrame(animRef.current)
-    }
-  }, [active, initPigeons])
-
-  useEffect(() => {
-    if (!active) {
       pigeonsRef.current = null
       lastTimeRef.current = null
     }
-  }, [active])
+  }, [active, initPigeons])
 
   if (!active) return null
 

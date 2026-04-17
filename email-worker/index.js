@@ -104,6 +104,32 @@ function escapeHtml(str) {
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 }
 
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+function safeHttpUrl(str) {
+  if (typeof str !== 'string') return ''
+  try {
+    const u = new URL(str)
+    if (u.protocol !== 'http:' && u.protocol !== 'https:') return ''
+    return u.toString()
+  } catch {
+    return ''
+  }
+}
+
+function sanitizeFavorite(art) {
+  if (!art || typeof art !== 'object') return null
+  const title = typeof art.title === 'string' ? art.title.slice(0, 300) : ''
+  if (!title) return null
+  return {
+    title,
+    artist: typeof art.artist === 'string' ? art.artist.slice(0, 200) : '',
+    date: typeof art.date === 'string' ? art.date.slice(0, 100) : '',
+    url: safeHttpUrl(art.url),
+    image: safeHttpUrl(art.image),
+  }
+}
+
 export default {
   async fetch(request, env) {
     if (request.method === 'OPTIONS') {
@@ -129,7 +155,7 @@ export default {
 
     const { email, favorites } = body
 
-    if (!email || typeof email !== 'string' || !email.includes('@')) {
+    if (!email || typeof email !== 'string' || email.length > 254 || !EMAIL_RE.test(email)) {
       return new Response(JSON.stringify({ error: 'Valid email required' }), {
         status: 400,
         headers: { ...corsHeaders(request), 'Content-Type': 'application/json' },
@@ -143,7 +169,15 @@ export default {
       })
     }
 
-    const html = buildEmailHTML(favorites)
+    const cleanFavorites = favorites.map(sanitizeFavorite).filter(Boolean)
+    if (cleanFavorites.length === 0) {
+      return new Response(JSON.stringify({ error: 'No valid favorites' }), {
+        status: 400,
+        headers: { ...corsHeaders(request), 'Content-Type': 'application/json' },
+      })
+    }
+
+    const html = buildEmailHTML(cleanFavorites)
 
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',

@@ -444,6 +444,32 @@ a:hover {
   border-radius: 0 2px 2px 0;
 }
 
+.nav-dropdown-item.coming-soon {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: rgba(27,42,74,0.45);
+  cursor: not-allowed;
+}
+.nav-dropdown-item.coming-soon:hover {
+  background: transparent;
+  color: rgba(27,42,74,0.45);
+}
+.nav-dropdown-badge {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #fff;
+  background: #d4a017;
+  padding: 2px 7px;
+  border-radius: 20px;
+}
+html.night-mode .nav-dropdown-item.coming-soon {
+  color: rgba(203,213,225,0.45);
+}
+
 /* ─── Pigeon Toggle ─── */
 .pigeon-toggle {
   font-family: var(--font-body);

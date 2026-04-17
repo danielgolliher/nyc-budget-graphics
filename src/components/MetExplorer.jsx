@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback, Fragment } from 'react'
+import { useState, useEffect, useRef, useCallback, memo, Fragment } from 'react'
 import './metExplorerStyles.css'
 
 const API_BASE = 'https://collectionapi.metmuseum.org/public/collection/v1'
@@ -162,7 +162,7 @@ function HeroSkeleton() {
   return <div className="met-hero-skeleton" />
 }
 
-function ArtworkCard({ artwork, onClick, index, isFavorite, toggleFavorite }) {
+const ArtworkCard = memo(function ArtworkCard({ artwork, onClick, index, starred, toggleFavorite }) {
   return (
     <div
       className="met-card"
@@ -177,11 +177,11 @@ function ArtworkCard({ artwork, onClick, index, isFavorite, toggleFavorite }) {
           decoding="async"
         />
         <button
-          className={`met-star-btn${isFavorite(artwork.objectID) ? ' starred' : ''}`}
+          className={`met-star-btn${starred ? ' starred' : ''}`}
           onClick={e => { e.stopPropagation(); toggleFavorite(artwork) }}
-          title={isFavorite(artwork.objectID) ? 'Remove from Favorites' : 'Add to Favorites'}
+          title={starred ? 'Remove from Favorites' : 'Add to Favorites'}
         >
-          {isFavorite(artwork.objectID) ? '★' : '☆'}
+          {starred ? '★' : '☆'}
         </button>
       </div>
       <div className="met-card-info">
@@ -192,7 +192,7 @@ function ArtworkCard({ artwork, onClick, index, isFavorite, toggleFavorite }) {
       </div>
     </div>
   )
-}
+})
 
 function CardSkeleton() {
   return (
@@ -768,7 +768,7 @@ export default function MetExplorer() {
                   artwork={art}
                   onClick={setSelectedArtwork}
                   index={i}
-                  isFavorite={isFavorite}
+                  starred={favorites.has(art.objectID)}
                   toggleFavorite={toggleFavorite}
                 />
               ))}

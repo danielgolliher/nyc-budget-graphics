@@ -90,15 +90,27 @@ export default function Layout({ children }) {
                 </svg>
               </button>
               <div className={`nav-dropdown-menu${dropdownOpen ? ' open' : ''}`}>
-                {categories.map(({ slug, label, navLabel }) => (
-                  <NavLink
-                    key={slug}
-                    to={`/${slug}`}
-                    className={({ isActive }) => `nav-dropdown-item${isActive ? ' active' : ''}`}
-                    onClick={closeMenu}
-                  >
-                    {navLabel || label}
-                  </NavLink>
+                {categories.map(({ slug, label, navLabel, comingSoon }) => (
+                  comingSoon ? (
+                    <span
+                      key={slug}
+                      className="nav-dropdown-item coming-soon"
+                      aria-disabled="true"
+                      title="Coming soon"
+                    >
+                      {navLabel || label}
+                      <span className="nav-dropdown-badge">Soon</span>
+                    </span>
+                  ) : (
+                    <NavLink
+                      key={slug}
+                      to={`/${slug}`}
+                      className={({ isActive }) => `nav-dropdown-item${isActive ? ' active' : ''}`}
+                      onClick={closeMenu}
+                    >
+                      {navLabel || label}
+                    </NavLink>
+                  )
                 ))}
               </div>
             </div>
@@ -143,7 +155,12 @@ export default function Layout({ children }) {
               </a>
             </div>
           </div>
-          <div className="footer-qr" title={pageUrl}>
+          <div
+            className="footer-qr"
+            title={pageUrl}
+            role="img"
+            aria-label={`QR code linking to ${pageUrl}`}
+          >
             <QRCodeSVG
               value={pageUrl}
               size={56}

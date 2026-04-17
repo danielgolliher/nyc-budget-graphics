@@ -161,7 +161,7 @@ export default function PedestrianTrafficMap() {
     tooltip.style.cssText = 'position:absolute;z-index:1500;display:none;background:rgba(10,10,15,0.95);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:12px 14px;font-size:12px;pointer-events:none;box-shadow:0 4px 20px rgba(0,0,0,0.5);min-width:180px;color:#fff;font-family:-apple-system,BlinkMacSystemFont,sans-serif'
     mapRef.current.parentElement.appendChild(tooltip)
 
-    map.getContainer().addEventListener('mousemove', (e) => {
+    const handleMouseMove = (e) => {
       const segments = segmentsRef.current
       if (!segments) return
       const rect = map.getContainer().getBoundingClientRect()
@@ -200,9 +200,10 @@ export default function PedestrianTrafficMap() {
       } else {
         tooltip.style.display = 'none'
       }
-    })
+    }
+    map.getContainer().addEventListener('mousemove', handleMouseMove)
 
-    // Fetch data
+    // Fetch data (XHR kept for progress events; aborted on unmount)
     const xhr = new XMLHttpRequest()
     xhr.open('GET', import.meta.env.BASE_URL + 'data/nyc_ped_compact.json', true)
     xhr.onprogress = (e) => {
@@ -230,6 +231,9 @@ export default function PedestrianTrafficMap() {
     xhr.send()
 
     return () => {
+      if (xhr.readyState < 4) xhr.abort()
+      map.getContainer().removeEventListener('mousemove', handleMouseMove)
+      tooltip.remove()
       map.remove()
       mapInstance.current = null
     }

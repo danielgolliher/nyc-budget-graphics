@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react'
 import { useLocation } from 'react-router-dom'
 import { QRCodeSVG } from 'qrcode.react'
-import html2canvas from 'html2canvas'
 
 export default function ShareMenu({ chartRef, chartId, title, dark, onDownload }) {
   const [copied, setCopied] = useState(false)
@@ -23,6 +22,7 @@ export default function ShareMenu({ chartRef, chartId, title, dark, onDownload }
   const handleDownload = useCallback(async () => {
     if (!chartRef?.current) return
     try {
+      const { default: html2canvas } = await import('html2canvas')
       const canvas = await html2canvas(chartRef.current, {
         backgroundColor: null,
         scale: 2,
@@ -92,7 +92,12 @@ export default function ShareMenu({ chartRef, chartId, title, dark, onDownload }
           </div>
         )}
       </div>
-      <div className="chart-qr" title={pageUrl}>
+      <div
+        className="chart-qr"
+        title={pageUrl}
+        role="img"
+        aria-label={`QR code linking to ${pageUrl}`}
+      >
         <QRCodeSVG
           value={pageUrl}
           size={48}
