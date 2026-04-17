@@ -1,0 +1,65 @@
+name: Refresh Council Quest bills
+
+on:
+  schedule:
+    # Every Friday 12:00 UTC (7am EST / 8am EDT, NYC).
+    - cron: "0 12 * * 5"
+  # Allow manual runs from the Actions tab.
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-bills
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          # Fetch full history so we can push without a shallow-clone error.
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Refresh bills from council.nyc.gov / jehiah archive
+        run: node scripts/refresh-bills.mjs
+
+      - name: Commit changes to main (if any)
+        id: commit
+        run: |
+          if git diff --quiet -- public/council-quest/game.html; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No bill changes this week."
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/council-quest/game.html
+          git commit -m "Bills: weekly refresh $(date -u +%Y-%m-%d)"
+          git push origin main
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Build site
+        if: steps.commit.outputs.changed == 'true'
+        run: npm run build
+
+      - name: Deploy to gh-pages
+        if: steps.commit.outputs.changed == 'true'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          publish_branch: gh-pages
+          cname: data.maximumnewyork.com
