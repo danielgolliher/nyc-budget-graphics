@@ -116,6 +116,14 @@ const categories = [
     preview: 'previews/pedestrian-traffic.svg',
     component: lazy(() => import('./pages/PedestrianTrafficPage')),
   },
+  {
+    slug: 'make-your-own',
+    label: 'Make Your Own',
+    description:
+      'Anyone can build a site like this with Claude and a free GitHub account. Here\'s how the pieces fit together.',
+    preview: 'previews/make-your-own.svg',
+    component: lazy(() => import('./pages/MakeYourOwnPage')),
+  },
 ]
 
 export default categories

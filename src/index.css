@@ -1429,3 +1429,194 @@ html.night-mode .nav-dropdown-item.coming-soon {
     grid-template-columns: 1fr;
   }
 }
+
+/* ─── How It Works Diagram (Make Your Own page) ─── */
+.hiw-flow {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto 1fr;
+  align-items: stretch;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.hiw-step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 28px 20px 20px;
+  border-radius: 10px;
+  border: 1.5px solid var(--color-border);
+  background: var(--color-bg);
+}
+
+.hiw-step-1 { --hiw-color: var(--color-accent); }
+.hiw-step-2 { --hiw-color: var(--color-navy-light); border-style: dashed; }
+.hiw-step-3 { --hiw-color: #2A8A7E; }
+
+.hiw-step { color: var(--hiw-color); }
+
+.hiw-num {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--hiw-color);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.hiw-icon {
+  width: 72px;
+  height: 54px;
+  margin-bottom: 12px;
+}
+
+.hiw-step h3 {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--color-navy);
+  margin-bottom: 8px;
+}
+
+.hiw-step p {
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--color-text-secondary);
+  margin-bottom: 16px;
+  flex: 1;
+}
+
+.hiw-tool {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  padding: 6px 12px;
+  border-radius: 20px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-light);
+}
+
+.hiw-tool strong {
+  color: var(--hiw-color);
+}
+
+.hiw-arrow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 96px;
+  color: var(--color-text-muted);
+}
+
+.hiw-arrow-line {
+  width: 48px;
+  height: 16px;
+}
+
+.hiw-arrow-label {
+  font-size: 12px;
+  line-height: 1.35;
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+html.night-mode .hiw-step-3 { --hiw-color: #4FC1B3; }
+html.night-mode .hiw-num { color: #121620; }
+
+@media (max-width: 860px) {
+  .hiw-flow {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+  .hiw-step {
+    margin-top: 14px;
+  }
+  .hiw-arrow {
+    width: auto;
+    flex-direction: row;
+    padding: 4px 0;
+  }
+  .hiw-arrow-line {
+    transform: rotate(90deg);
+    width: 36px;
+  }
+}
+
+/* ─── Make Your Own page text ─── */
+.myo-prose {
+  max-width: 720px;
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--color-text);
+}
+
+.myo-prose h2 {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--color-navy);
+  margin: 8px 0 12px;
+}
+
+.myo-prose p {
+  margin-bottom: 16px;
+}
+
+.myo-prose ol {
+  padding-left: 22px;
+  margin-bottom: 20px;
+}
+
+.myo-prose li {
+  margin-bottom: 10px;
+}
+
+.myo-prose a {
+  color: var(--color-accent);
+}
+
+.myo-prompt {
+  position: relative;
+  padding: 20px 20px 56px;
+  border-radius: 8px;
+  border: 1px solid rgba(190,83,67,0.3);
+  background: rgba(190,83,67,0.06);
+}
+
+.myo-prompt p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--color-navy);
+}
+
+.myo-copy-btn {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  padding: 6px 16px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--color-accent);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.myo-copy-btn:hover {
+  background: var(--color-accent-hover);
+}
