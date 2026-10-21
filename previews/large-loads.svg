@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 140">
+  <defs><clipPath id="ll-over"><rect x="0" y="0" width="200" height="60"/></clipPath></defs>
+  <rect width="200" height="140" rx="4" fill="#0f2d6b"/>
+  <!-- Faint drafting grid -->
+  <g stroke="rgba(234,241,255,0.06)" stroke-width="0.5">
+    <line x1="0" y1="35" x2="200" y2="35"/><line x1="0" y1="70" x2="200" y2="70"/><line x1="0" y1="105" x2="200" y2="105"/>
+    <line x1="50" y1="0" x2="50" y2="140"/><line x1="100" y1="0" x2="100" y2="140"/><line x1="150" y1="0" x2="150" y2="140"/>
+  </g>
+  <!-- Title as the yellow large-load banner (kept inside the band the homepage card shows) -->
+  <rect x="14" y="32" width="70" height="15" fill="#ffc933" stroke="#17130a" stroke-width="1.2"/>
+  <text x="49" y="43.2" fill="#17130a" font-size="8.5" font-weight="900" font-family="sans-serif" text-anchor="middle" letter-spacing="0.4">LARGE LOADS</text>
+  <!-- A heatwave day against the grid's limit -->
+  <path d="M14,90 C60,89 90,76 118,58 C134,47 150,50 186,70 L186,96 L14,96 Z" fill="rgba(188,203,239,0.28)" stroke="#bccbef" stroke-width="1"/>
+  <path d="M14,90 C60,89 90,76 118,58 C134,47 150,50 186,70 L186,96 L14,96 Z" fill="#ff6d60" clip-path="url(#ll-over)"/>
+  <line x1="14" y1="60" x2="186" y2="60" stroke="#eaf1ff" stroke-width="0.9" stroke-dasharray="3 2"/>
+  <!-- Data centers: a flat 24/7 band under everything -->
+  <rect x="14" y="96" width="172" height="12" fill="#ffc933" opacity="0.9"/>
+  <text x="18" y="104.5" fill="#17130a" font-size="6.5" font-weight="700" font-family="sans-serif" letter-spacing="0.3">DATA CENTERS</text>
+</svg>
