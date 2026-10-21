@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Title, description, canonical and social-preview tags are filled in per page by
+         scripts/site-pages.js from src/categories.js. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-wVqsf23MhdNF0QoNZmlYvxHw4UwqrC0uYpoqh7IN1+Q=' 'sha256-d4I1ggyWdfY6a9r04Sl1TiF5uM8Ultfb1a8UP7uNSJc=' 'sha256-UmcI69dRvCySiYPVzxp5DDGzkBKe+Mq3YQ5j6JbW3YA=' https://*.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://images.metmuseum.org https://server.arcgisonline.com https://*.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com https://*.g.doubleclick.net https://www.google.com; connect-src 'self' https://collectionapi.metmuseum.org https://met-favorites-email.danielgolliher.workers.dev https://*.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com https://*.g.doubleclick.net https://www.google.com; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests" />
+    <title>Met Museum Explorer — Maximum New York Data Viz &amp; Art</title>
+    <meta name="description" content="Discover and explore 500,000+ artworks from The Metropolitan Museum of Art's open collection. Star favorites and email them to yourself." />
+    <meta name="robots" content="noindex" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Maximum New York Data Viz &amp; Art" />
+    <meta property="og:title" content="Met Museum Explorer — Maximum New York Data Viz &amp; Art" />
+    <meta property="og:description" content="Discover and explore 500,000+ artworks from The Met's open collection. Star favorites and email them to yourself." />
+    <meta property="og:url" content="https://data.maximumnewyork.com/embed/met-explorer" />
+    <meta property="og:image" content="https://data.maximumnewyork.com/og-met-explorer.jpg" />
+    <meta property="og:image:width" content="579" />
+    <meta property="og:image:height" content="624" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Met Museum Explorer — Maximum New York Data Viz &amp; Art" />
+    <meta name="twitter:description" content="Discover and explore 500,000+ artworks from The Met's open collection. Star favorites and email them to yourself." />
+    <meta name="twitter:image" content="https://data.maximumnewyork.com/og-met-explorer.jpg" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-W0FX2ZP1ES"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-W0FX2ZP1ES');
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700&family=JetBrains+Mono:wght@400;500;600&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+    <script type="module" crossorigin src="/assets/index-iXVMTKKp.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-DWsUgAov.css">
+  </head>
+  <body>
+    <script>try{if(localStorage.getItem('nightMode')==='true')document.documentElement.classList.add('night-mode')}catch(e){}</script>
+    <!-- Old links of the form /?/page (from the previous GitHub Pages redirect setup) -->
+    <script>
+      (function(l) {
+        if (l.search[1] === '/') {
+          var decoded = l.search.slice(1).split('&').map(function(s) {
+            return s.replace(/~and~/g, '&')
+          }).join('?');
+          window.history.replaceState(null, null, '/' + decoded.replace(/^\/+/, '') + l.hash);
+        }
+      }(window.location))
+    </script>
+    <div id="root"></div>
+  </body>
+</html>
