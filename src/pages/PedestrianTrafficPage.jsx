@@ -30,7 +30,7 @@ export default function PedestrianTrafficPage() {
             <em>Nature Cities</em>
           </a>{' '}
           by Andres Sevtsuk, Rounaq Basu, Liye Liu, Abdulaziz Alhassan, and Jack Kollar of the{' '}
-          <a href="http://cityform.mit.edu/projects/nycwalks"
+          <a href="https://cityform.mit.edu/projects/nycwalks"
             target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-accent)' }}>
             MIT City Form Lab
           </a>.
@@ -80,7 +80,7 @@ export default function PedestrianTrafficPage() {
         <p style={{ marginBottom: 12 }}>
           The underlying dataset contains 315,577 street segments with modeled pedestrian volume estimates
           for six peak periods (weekday and weekend, each with AM, midday, and PM). We downloaded the{' '}
-          <a href="http://cityform.mit.edu/projects/nycwalks"
+          <a href="https://cityform.mit.edu/projects/nycwalks"
             target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-accent)' }}>
             publicly available GeoJSON
           </a>{' '}
@@ -108,7 +108,7 @@ export default function PedestrianTrafficPage() {
           </li>
           <li style={{ marginBottom: 6 }}>
             Dataset:{' '}
-            <a href="http://cityform.mit.edu/projects/nycwalks"
+            <a href="https://cityform.mit.edu/projects/nycwalks"
               target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-accent)' }}>
               NYCWalks — MIT City Form Lab
             </a>{' '}
@@ -123,9 +123,9 @@ export default function PedestrianTrafficPage() {
           </li>
           <li>
             Basemap tiles:{' '}
-            <a href="https://carto.com/basemaps/" target="_blank" rel="noopener noreferrer"
+            <a href="https://www.arcgis.com/home/item.html?id=358ec1e175ea41c3bf5c68f0da11ae2b" target="_blank" rel="noopener noreferrer"
               style={{ color: 'var(--color-accent)' }}>
-              CARTO Dark Matter
+              Esri Dark Gray Canvas
             </a>
           </li>
         </ul>

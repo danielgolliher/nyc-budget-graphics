@@ -11,6 +11,7 @@
 
 import fs from 'node:fs'
 import path from 'node:path'
+import vm from 'node:vm'
 import { execSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 
@@ -85,8 +86,20 @@ function cleanTitle(name) {
 
 // "Int 0298-2026" → "0298"
 function parseBillNumber(file) {
-    const m = String(file || '').match(/Int\s+(\d+)/)
+    const m = String(file || '').match(/^Int\s+(\d{1,5})\b/i)
     return m ? m[1].padStart(4, '0') : null
+}
+
+// Archive text lands inside game.html's <script> block. JSON.stringify alone leaves "<"
+// alone, so a title containing "</script>" or "<!--" would end or break the script. Escape
+// those (and the line separators older parsers choke on) as \u sequences.
+function jsStr(value) {
+    return JSON.stringify(String(value))
+        .replace(/</g, '\\u003c')
+        .replace(/>/g, '\\u003e')
+        .replace(/&/g, '\\u0026')
+        .replace(/\u2028/g, '\\u2028')
+        .replace(/\u2029/g, '\\u2029')
 }
 
 // ────────────────────────────── main ──────────────────────────────
@@ -154,7 +167,9 @@ for (const year of SESSION_YEARS) {
         try { b = JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8')) }
         catch { continue }
         if (!b || !Array.isArray(b.Sponsors) || b.Sponsors.length === 0) continue
-        const num = parseBillNumber(b.File) || f.replace('.json', '').padStart(4, '0')
+        // Only well-formed intro numbers: they're written into the page unquoted-safe.
+        const num = parseBillNumber(b.File)
+        if (!num) { console.warn(`Skipping ${year}/${f}: unexpected File ${JSON.stringify(b.File)}`); continue }
         const title = cleanTitle(b.Name)
         const status = statusCode(b.StatusName)
         if (!title) continue
@@ -183,7 +198,7 @@ for (const d in cosponsored) cosponsored[d].sort((a, b) => a.localeCompare(b))
 
 function fmtPair(arr) { // ["0298","Title","C"]
     const [n, t, s] = arr
-    return `["${n}",${JSON.stringify(t)},"${s}"]`
+    return `[${jsStr(n)},${jsStr(t)},${jsStr(s)}]`
 }
 
 function renderLegis() {
@@ -217,7 +232,7 @@ function renderColegisExt() {
         if (nums.length === 0) {
             lines.push(`    ${d}: [],`)
         } else {
-            const inner = nums.map(n => `"${n}"`).join(',')
+            const inner = nums.map(jsStr).join(',')
             lines.push(`    ${d}: [${inner}],`)
         }
     }
@@ -236,7 +251,7 @@ function renderColegisPrimary() {
         if (nums.length === 0) {
             lines.push(`    ${d}: [],`)
         } else {
-            const inner = nums.map(n => `"${n}"`).join(',')
+            const inner = nums.map(jsStr).join(',')
             lines.push(`    ${d}: [${inner}],`)
         }
     }
@@ -252,7 +267,7 @@ function renderBillDB() {
     const lines = ['const B={']
     for (const n of nums) {
         const [t, s] = billDB[n]
-        lines.push(`"${n}":[${JSON.stringify(t)},"${s}"],`)
+        lines.push(`${jsStr(n)}:[${jsStr(t)},${jsStr(s)}],`)
     }
     lines[lines.length - 1] = lines[lines.length - 1].replace(/,$/, '')
     lines.push('};')
@@ -261,7 +276,8 @@ function renderBillDB() {
 
 // ─────────────────────── splice into game.html ──────────────────────
 
-let html = fs.readFileSync(GAME, 'utf8')
+const original = fs.readFileSync(GAME, 'utf8')
+let html = original
 
 function spliceBlock(source, startMarker, endPattern, replacement) {
     // Replace from `startMarker` line through the first `};` after it.
@@ -278,6 +294,40 @@ html = spliceBlock(html, 'const B={',             '\n};', renderBillDB())
 html = spliceBlock(html, 'const COLEGIS = {',     '\n};', renderColegisPrimary())
 html = spliceBlock(html, 'const COLEGIS_EXT = {', '\n};', renderColegisExt())
 
+// ─────────────────────────── summary ────────────────────────────
+
+const totalPrimary = Object.values(primary).reduce((a, b) => a + b.length, 0)
+const totalCo = Object.values(cosponsored).reduce((a, b) => a + b.length, 0)
+const withPrimary = Object.values(primary).filter(b => b.length > 0).length
+const withCo = Object.values(cosponsored).filter(b => b.length > 0).length
+
+// ─────────────────────────── safety checks ──────────────────────────
+// This runs unattended and deploys what it writes, so refuse anything that looks like a
+// broken upstream (renamed folders, changed sponsor fields) or a page that no longer parses.
+
+function fail(msg) {
+    console.error(`Refusing to write ${GAME}: ${msg}`)
+    process.exit(1)
+}
+
+const prevBlock = original.slice(original.indexOf('const B={'), original.indexOf('\n};', original.indexOf('const B={')))
+const prevBills = (prevBlock.match(/^"\d+":/gm) || []).length
+const nowBills = Object.keys(billDB).length
+// Intro counts only grow during a session; allow a little slack for withdrawn files.
+if (nowBills < prevBills * 0.98) fail(`${nowBills} bills, down from ${prevBills}`)
+if (prevBills > 0 && withPrimary < 40) fail(`only ${withPrimary}/51 districts have primary-sponsored bills`)
+
+const scriptCount = (s) => (s.match(/<\/script/gi) || []).length
+if (scriptCount(html) !== scriptCount(original)) fail('the number of </script> tags changed')
+for (const [, body] of html.matchAll(/<script>([\s\S]*?)<\/script>/g)) {
+    try { new vm.Script(body) } catch (err) { fail(`game script no longer parses: ${err.message}`) }
+}
+
+if (html === original) {
+    console.log('No bill changes this week.')
+    process.exit(0)
+}
+
 // Stamp the freshness so you can tell at a glance when data last ran.
 const today = new Date().toISOString().slice(0, 10)
 html = html.replace(
@@ -286,13 +336,6 @@ html = html.replace(
 )
 
 fs.writeFileSync(GAME, html)
-
-// ─────────────────────────── summary ────────────────────────────
-
-const totalPrimary = Object.values(primary).reduce((a, b) => a + b.length, 0)
-const totalCo = Object.values(cosponsored).reduce((a, b) => a + b.length, 0)
-const withPrimary = Object.values(primary).filter(b => b.length > 0).length
-const withCo = Object.values(cosponsored).filter(b => b.length > 0).length
 
 console.log(`Processed ${billsSeen} introductions across ${SESSION_YEARS.join(', ')}.`)
 console.log(`Primary-sponsored: ${totalPrimary} bills across ${withPrimary}/51 districts.`)

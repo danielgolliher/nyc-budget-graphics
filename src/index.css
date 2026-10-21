@@ -1088,6 +1088,13 @@ html.night-mode .nav-dropdown-item.coming-soon {
   margin-bottom: 16px;
 }
 
+/* No navbar in embeds, and the embed's page padding is 16px (not 24px) */
+.embed-wrapper .payroll-chart-nav-sticky {
+  top: 0;
+  margin-left: -16px;
+  margin-right: -16px;
+}
+
 /* ─── Payroll Page: Sticky Chart Nav ─── */
 .payroll-chart-nav-sticky {
   position: sticky;
@@ -1251,6 +1258,9 @@ html.night-mode .nav-dropdown-item.coming-soon {
   }
   .navbar {
     padding: 0 16px;
+    /* The closed menu waits just past the right edge. backdrop-filter makes the navbar its
+       containing block, so without clipping the whole page could be scrolled sideways. */
+    overflow-x: clip;
   }
   .navbar-brand {
     font-size: 16px;
@@ -1282,13 +1292,17 @@ html.night-mode .nav-dropdown-item.coming-soon {
     border-radius: 0 0 0 12px;
     transform: translateX(100%);
     opacity: 0;
-    transition: transform 0.3s ease, opacity 0.25s ease;
+    /* Hidden (not just transparent) while closed, so Tab can't land on invisible links. */
+    visibility: hidden;
+    transition: transform 0.3s ease, opacity 0.25s ease, visibility 0s linear 0.3s;
     z-index: 200;
     overflow-y: auto;
   }
   .navbar-links.open {
     transform: translateX(0);
     opacity: 1;
+    visibility: visible;
+    transition: transform 0.3s ease, opacity 0.25s ease;
   }
 
   /* Mobile dropdown overrides */

@@ -2,6 +2,31 @@ import { useState, useCallback } from 'react'
 import { useLocation } from 'react-router-dom'
 import { QRCodeSVG } from 'qrcode.react'
 
+// navigator.clipboard is missing on non-HTTPS origins and can be refused inside iframes,
+// so fall back to the old textarea + execCommand route.
+async function copyText(text) {
+  try {
+    await navigator.clipboard.writeText(text)
+    return true
+  } catch {
+    const ta = document.createElement('textarea')
+    ta.value = text
+    ta.setAttribute('readonly', '')
+    ta.style.position = 'fixed'
+    ta.style.opacity = '0'
+    document.body.appendChild(ta)
+    ta.select()
+    let ok = false
+    try {
+      ok = document.execCommand('copy')
+    } catch {
+      ok = false
+    }
+    ta.remove()
+    return ok
+  }
+}
+
 export default function ShareMenu({ chartRef, chartId, title, dark, onDownload }) {
   const [copied, setCopied] = useState(false)
   const [showEmbed, setShowEmbed] = useState(false)
@@ -9,14 +34,15 @@ export default function ShareMenu({ chartRef, chartId, title, dark, onDownload }
 
   const location = useLocation()
   const origin = window.location.origin
-  const pageUrl = `${origin}${location.pathname}`
-  const embedUrl = `${origin}/embed${location.pathname}`
+  const path = location.pathname.replace(/^\/embed(?=\/)/, '').replace(/\/+$/, '')
+  const pageUrl = `${origin}${path}`
+  const embedUrl = `${origin}/embed${path}`
 
-  const handleCopyLink = useCallback(() => {
-    navigator.clipboard.writeText(pageUrl).then(() => {
+  const handleCopyLink = useCallback(async () => {
+    if (await copyText(pageUrl)) {
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
-    })
+    }
   }, [pageUrl])
 
   const handleDownload = useCallback(async () => {
@@ -62,13 +88,13 @@ export default function ShareMenu({ chartRef, chartId, title, dark, onDownload }
     }
   }, [chartRef, chartId, pageUrl])
 
-  const embedCode = `<iframe src="${embedUrl}" width="100%" height="600" frameborder="0" title="${title} — Maximum New York"></iframe>`
+  const embedCode = `<iframe src="${embedUrl}" width="100%" height="600" style="border:0" loading="lazy" title="${title} — Maximum New York"></iframe>`
 
-  const handleCopyEmbed = useCallback(() => {
-    navigator.clipboard.writeText(embedCode).then(() => {
+  const handleCopyEmbed = useCallback(async () => {
+    if (await copyText(embedCode)) {
       setEmbedCopied(true)
       setTimeout(() => setEmbedCopied(false), 2000)
-    })
+    }
   }, [embedCode])
 
   return (
@@ -80,12 +106,12 @@ export default function ShareMenu({ chartRef, chartId, title, dark, onDownload }
         <button className="share-btn" onClick={onDownload || handleDownload} title="Download as PNG">
           Download
         </button>
-        <button className="share-btn" onClick={() => setShowEmbed(!showEmbed)} title="Get embed code">
+        <button className="share-btn" onClick={() => setShowEmbed(!showEmbed)} title="Get embed code" aria-expanded={showEmbed}>
           Embed
         </button>
         {showEmbed && (
           <div className="embed-popover">
-            <textarea readOnly value={embedCode} rows={3} />
+            <textarea readOnly value={embedCode} rows={3} aria-label="Embed code" onFocus={(e) => e.target.select()} />
             <button className="embed-copy-btn" onClick={handleCopyEmbed}>
               {embedCopied ? '✓ Copied' : 'Copy code'}
             </button>

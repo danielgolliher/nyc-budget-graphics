@@ -2,6 +2,12 @@ import { useState, useEffect, useRef, useCallback, memo, Fragment } from 'react'
 import './metExplorerStyles.css'
 
 const API_BASE = 'https://collectionapi.metmuseum.org/public/collection/v1'
+// The Met retired /v1/search on 2026-10-01 (it now returns 410 Gone). /v1.1/search takes the
+// same filters but is paginated, so ask for the largest page (500 IDs): plenty to shuffle
+// and scroll through.
+const SEARCH_URL = 'https://collectionapi.metmuseum.org/public/collection/v1.1/search'
+const SEARCH_LIMIT = 500
+const searchUrl = (params) => `${SEARCH_URL}?${params}&limit=${SEARCH_LIMIT}`
 
 // Pre-verified European Paintings highlights (public domain, with images)
 const SEED_IDS = [436535, 438817, 437853, 436528, 437329, 435809, 436965, 438012, 437984, 436573, 435621, 437397]
@@ -299,6 +305,8 @@ function FavoritesButton({ count, onClick }) {
 }
 
 const EMAIL_WORKER_URL = 'https://met-favorites-email.danielgolliher.workers.dev'
+// The worker looks each favorite up on the Met API, so it caps how many one email can hold.
+const MAX_EMAIL_FAVORITES = 40
 
 function FavoritesSidePanel({ favorites, onClose, onRemove, onSelect }) {
   const [email, setEmail] = useState('')
@@ -325,12 +333,17 @@ function FavoritesSidePanel({ favorites, onClose, onRemove, onSelect }) {
   const handleSend = async (e) => {
     e.preventDefault()
     if (!email.trim() || sending) return
+    if (items.length > MAX_EMAIL_FAVORITES) {
+      setSendError(`You can email up to ${MAX_EMAIL_FAVORITES} favorites at a time. Remove a few and try again.`)
+      return
+    }
     setSending(true)
     setSendError(null)
 
     const payload = {
       email: email.trim(),
       favorites: items.map(art => ({
+        objectID: art.objectID,
         title: art.title,
         artist: art.artistDisplayName || null,
         date: art.objectDate || null,
@@ -345,7 +358,7 @@ function FavoritesSidePanel({ favorites, onClose, onRemove, onSelect }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       })
-      const data = await res.json()
+      const data = await res.json().catch(() => ({}))
       if (!res.ok) throw new Error(data.error || 'Failed to send')
       setSent(true)
     } catch (err) {
@@ -504,7 +517,7 @@ export default function MetExplorer() {
 
         // Background-fetch full list for load-more
         const res = await fetch(
-          `${API_BASE}/search?hasImages=true&isPublicDomain=true&q=*&departmentId=11`,
+          searchUrl('hasImages=true&isPublicDomain=true&q=*&departmentId=11'),
           { signal }
         )
         if (!res.ok) throw new Error('Failed to fetch artwork list')
@@ -539,7 +552,7 @@ export default function MetExplorer() {
     try {
       const deptParam = dept === 'All' ? '' : `&departmentId=${DEPARTMENTS.indexOf(dept)}`
       const res = await fetch(
-        `${API_BASE}/search?hasImages=true&isPublicDomain=true&q=*${deptParam}`,
+        searchUrl(`hasImages=true&isPublicDomain=true&q=*${deptParam}`),
         { signal }
       )
       if (!res.ok) throw new Error('Search failed')
@@ -580,7 +593,7 @@ export default function MetExplorer() {
         ? `&departmentId=${DEPARTMENTS.indexOf(department)}`
         : ''
       const res = await fetch(
-        `${API_BASE}/search?hasImages=true&isPublicDomain=true&q=${encodeURIComponent(query)}${deptParam}`,
+        searchUrl(`hasImages=true&isPublicDomain=true&q=${encodeURIComponent(query)}${deptParam}`),
         { signal }
       )
       if (!res.ok) throw new Error('Search failed')

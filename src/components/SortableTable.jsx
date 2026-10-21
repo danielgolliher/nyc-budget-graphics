@@ -47,6 +47,10 @@ export default function SortableTable({ data, hoveredState, setHoveredState }) {
             {columns.map((col) => (
               <th key={col.key}
                 onClick={() => handleSort(col.key)}
+                // Keyboard access to sorting
+                tabIndex={0}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleSort(col.key) } }}
+                aria-sort={sortKey === col.key ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}
                 className={sortKey === col.key ? 'active' : ''}
                 style={{ textAlign: col.align }}>
                 {col.label}{arrow(col.key)}

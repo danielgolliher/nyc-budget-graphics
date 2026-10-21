@@ -406,7 +406,11 @@ export default function SeqraBattle() {
           position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
           display: 'flex', justifyContent: 'center', alignItems: 'center',
           background: 'rgba(0,0,0,0.3)', cursor: 'pointer',
-        }} onClick={start}>
+        }} onClick={start}
+          // Keyboard access: this overlay is the only way to start or replay
+          role="button" tabIndex={0}
+          aria-label={done ? 'Replay HOUSE vs. SEQRA' : 'Start HOUSE vs. SEQRA'}
+          onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); start() } }}>
           <span style={{
             color: '#fff', fontFamily: '"Courier New", monospace', fontWeight: 'bold',
             fontSize: 'clamp(18px, 3.5vw, 28px)', textShadow: '3px 3px 0 #000',

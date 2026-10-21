@@ -23,6 +23,25 @@ const formatWealth = (val) => {
   return val.toFixed(3);
 };
 
+// Number input that keeps the raw text while it is being typed. A plain controlled
+// <input type="number"> snaps back whenever the text is briefly invalid ("" or "-"),
+// so the field couldn't be cleared and typing "-2" over a rate gave 2%.
+const NumberField = ({ value, onValue, ...props }) => {
+  const [draft, setDraft] = useState(null);
+  return (
+    <input
+      type="number"
+      {...props}
+      value={draft ?? value}
+      onChange={(e) => {
+        setDraft(e.target.value);
+        onValue(e.target.value);
+      }}
+      onBlur={() => setDraft(null)}
+    />
+  );
+};
+
 const Popover = ({ children, inTooltip = false, content }) => {
   const [show, setShow] = useState(false);
 
@@ -363,13 +382,12 @@ export default function GrowthChart() {
             >
               Starting Value
             </label>
-            <input
-              type="number"
+            <NumberField
               value={startValue}
               min={0.1}
               step={0.5}
-              onChange={(e) => {
-                const v = parseFloat(e.target.value);
+              onValue={(raw) => {
+                const v = parseFloat(raw);
                 if (!isNaN(v) && v > 0) setStartValue(v);
               }}
               style={{ ...inputStyle, width: 70 }}
@@ -563,11 +581,10 @@ export default function GrowthChart() {
 
                 {/* Rate Input */}
                 <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                  <input
-                    type="number"
+                  <NumberField
                     value={line.rate}
                     step={0.5}
-                    onChange={(e) => updateRate(line.id, e.target.value)}
+                    onValue={(raw) => updateRate(line.id, raw)}
                     style={{ ...inputStyle, width: 65, textAlign: "right" }}
                   />
                   <span

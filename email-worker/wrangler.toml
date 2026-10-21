@@ -1,6 +1,18 @@
 name = "met-favorites-email"
 main = "index.js"
-compatibility_date = "2024-01-01"
+compatibility_date = "2025-10-01"
+
+# Rate limits (Workers Rate Limiting API). The worker checks these per caller IP and per
+# recipient address; if the bindings are missing it falls back to a weaker in-memory limit.
+[[ratelimits]]
+name = "IP_LIMIT"
+namespace_id = "1001"
+simple = { limit = 5, period = 60 }
+
+[[ratelimits]]
+name = "RECIPIENT_LIMIT"
+namespace_id = "1002"
+simple = { limit = 1, period = 60 }
 
 # After deploying, set your Resend API key as a secret:
 #   npx wrangler secret put RESEND_API_KEY

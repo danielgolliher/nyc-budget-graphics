@@ -54,6 +54,7 @@ export default function PedestrianTrafficMap() {
   const [currentTime, setCurrentTime] = useState('MD')
   const [loading, setLoading] = useState(true)
   const [loadMsg, setLoadMsg] = useState('Downloading data...')
+  const [failed, setFailed] = useState(false) // load/parse error: keep the message, stop the spinner
   const [segCount, setSegCount] = useState(0)
   const [fullScreen, setFullScreen] = useState(false)
   const containerRef = useRef(null)
@@ -74,9 +75,16 @@ export default function PedestrianTrafficMap() {
 
     L.control.zoom({ position: 'topright' }).addTo(map)
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
-      subdomains: 'abcd',
+    // Esri's Dark Gray Canvas (base + labels). CARTO's dark basemap used to be here, but it
+    // now requires an API key and serves "API KEY REQUIRED" tiles without one.
+    const esri = 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas'
+    L.tileLayer(`${esri}/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}`, {
+      attribution: 'Tiles &copy; <a href="https://www.esri.com/">Esri</a> &mdash; Esri, HERE, Garmin, &copy; OpenStreetMap contributors',
+      maxNativeZoom: 16,
+      maxZoom: 19,
+    }).addTo(map)
+    L.tileLayer(`${esri}/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}`, {
+      maxNativeZoom: 16,
       maxZoom: 19,
     }).addTo(map)
 
@@ -118,6 +126,9 @@ export default function PedestrianTrafficMap() {
         const zoom = m.getZoom()
         const fi = FI[dayRef.current + timeRef.current]
         const buckets = {}
+        // Visible segments' screen points [index, x0, y0, x1, y1, ...], reused by the hover
+        // hit test so it doesn't re-project every segment on each mousemove
+        const vis = []
 
         for (let i = 0; i < segments.length; i++) {
           const s = segments[i]
@@ -134,7 +145,9 @@ export default function PedestrianTrafficMap() {
           const p0 = m.latLngToContainerPoint([s[1], s[0]])
           const p1 = m.latLngToContainerPoint([s[3], s[2]])
           buckets[key].pts.push(p0.x, p0.y, p1.x, p1.y)
+          vis.push(i, p0.x, p0.y, p1.x, p1.y)
         }
+        this._vis = vis
 
         for (const key of Object.keys(buckets)) {
           const b = buckets[key]
@@ -161,28 +174,26 @@ export default function PedestrianTrafficMap() {
     tooltip.style.cssText = 'position:absolute;z-index:1500;display:none;background:rgba(10,10,15,0.95);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:12px 14px;font-size:12px;pointer-events:none;box-shadow:0 4px 20px rgba(0,0,0,0.5);min-width:180px;color:#fff;font-family:-apple-system,BlinkMacSystemFont,sans-serif'
     mapRef.current.parentElement.appendChild(tooltip)
 
+    // Hit test at most once per frame, against the screen points cached by the last redraw
+    let hoverRaf = 0, hoverX = 0, hoverY = 0
     const handleMouseMove = (e) => {
+      hoverX = e.clientX; hoverY = e.clientY
+      if (!hoverRaf) hoverRaf = requestAnimationFrame(hitTest)
+    }
+    const hitTest = () => {
+      hoverRaf = 0
       const segments = segmentsRef.current
       if (!segments) return
+      const vis = canvasLayer._vis
+      if (!vis) { tooltip.style.display = 'none'; return }
       const rect = map.getContainer().getBoundingClientRect()
-      const mx = e.clientX - rect.left, my = e.clientY - rect.top
+      const mx = hoverX - rect.left, my = hoverY - rect.top
       const fi = FI[dayRef.current + timeRef.current]
       let best = null, bestDist = 6
 
-      const bounds = map.getBounds()
-      const minLng = bounds.getWest(), maxLng = bounds.getEast()
-      const minLat = bounds.getSouth(), maxLat = bounds.getNorth()
-
-      for (let i = 0; i < segments.length; i++) {
-        const s = segments[i]
-        if (s[0] < minLng && s[2] < minLng) continue
-        if (s[0] > maxLng && s[2] > maxLng) continue
-        if (s[1] < minLat && s[3] < minLat) continue
-        if (s[1] > maxLat && s[3] > maxLat) continue
-        const p0 = map.latLngToContainerPoint([s[1], s[0]])
-        const p1 = map.latLngToContainerPoint([s[3], s[2]])
-        const d = ptSegDist(mx, my, p0.x, p0.y, p1.x, p1.y)
-        if (d < bestDist) { bestDist = d; best = s }
+      for (let j = 0; j < vis.length; j += 5) {
+        const d = ptSegDist(mx, my, vis[j + 1], vis[j + 2], vis[j + 3], vis[j + 4])
+        if (d < bestDist) { bestDist = d; best = segments[vis[j]] }
       }
 
       if (best) {
@@ -201,9 +212,18 @@ export default function PedestrianTrafficMap() {
         tooltip.style.display = 'none'
       }
     }
+    const hideTooltip = () => {
+      if (hoverRaf) { cancelAnimationFrame(hoverRaf); hoverRaf = 0 }
+      tooltip.style.display = 'none'
+    }
+    // Cached points go stale as soon as the map moves; the next redraw (moveend) rebuilds them
+    const handleMoveStart = () => { canvasLayer._vis = null; hideTooltip() }
     map.getContainer().addEventListener('mousemove', handleMouseMove)
+    map.getContainer().addEventListener('mouseleave', hideTooltip)
+    map.on('movestart', handleMoveStart)
 
     // Fetch data (XHR kept for progress events; aborted on unmount)
+    let parseTimer
     const xhr = new XMLHttpRequest()
     xhr.open('GET', import.meta.env.BASE_URL + 'data/nyc_ped_compact.json', true)
     xhr.onprogress = (e) => {
@@ -213,7 +233,7 @@ export default function PedestrianTrafficMap() {
     xhr.onload = () => {
       if (xhr.status === 200) {
         setLoadMsg('Parsing data...')
-        setTimeout(() => {
+        parseTimer = setTimeout(() => {
           try {
             segmentsRef.current = JSON.parse(xhr.responseText)
             setSegCount(segmentsRef.current.length)
@@ -221,18 +241,24 @@ export default function PedestrianTrafficMap() {
             canvasLayer.addTo(map)
           } catch (err) {
             setLoadMsg('Parse error: ' + err.message)
+            setFailed(true)
           }
         }, 30)
       } else {
         setLoadMsg('Error: HTTP ' + xhr.status)
+        setFailed(true)
       }
     }
-    xhr.onerror = () => setLoadMsg('Network error')
+    xhr.onerror = () => { setLoadMsg('Network error'); setFailed(true) }
     xhr.send()
 
     return () => {
       if (xhr.readyState < 4) xhr.abort()
+      clearTimeout(parseTimer)
+      hideTooltip()
+      map.off('movestart', handleMoveStart)
       map.getContainer().removeEventListener('mousemove', handleMouseMove)
+      map.getContainer().removeEventListener('mouseleave', hideTooltip)
       tooltip.remove()
       map.remove()
       mapInstance.current = null
@@ -246,16 +272,17 @@ export default function PedestrianTrafficMap() {
     }
   }, [currentDay, currentTime])
 
-  // Invalidate map size when fullscreen toggles
+  // Invalidate map size when fullscreen toggles (timer cleared, and map re-checked, in case
+  // the component unmounts first — cleanup above sets mapInstance.current to null)
   useEffect(() => {
-    if (mapInstance.current) {
-      setTimeout(() => {
-        mapInstance.current.invalidateSize()
-        if (canvasLayerRef.current && segmentsRef.current) {
-          canvasLayerRef.current.redraw()
-        }
-      }, 50)
-    }
+    const id = setTimeout(() => {
+      if (!mapInstance.current) return
+      mapInstance.current.invalidateSize()
+      if (canvasLayerRef.current && segmentsRef.current) {
+        canvasLayerRef.current.redraw()
+      }
+    }, 50)
+    return () => clearTimeout(id)
   }, [fullScreen])
 
   // Escape key exits fullscreen
@@ -363,11 +390,13 @@ export default function PedestrianTrafficMap() {
           position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
           zIndex: 2000, textAlign: 'center', pointerEvents: 'none',
         }}>
-          <div style={{
-            width: 36, height: 36, border: '3px solid rgba(255,255,255,0.1)',
-            borderTopColor: '#60a5fa', borderRadius: '50%',
-            animation: 'ped-spin 1s linear infinite', margin: '0 auto 10px',
-          }} />
+          {!failed && (
+            <div style={{
+              width: 36, height: 36, border: '3px solid rgba(255,255,255,0.1)',
+              borderTopColor: '#60a5fa', borderRadius: '50%',
+              animation: 'ped-spin 1s linear infinite', margin: '0 auto 10px',
+            }} />
+          )}
           <div style={{ fontSize: 13, color: '#ccc' }}>{loadMsg}</div>
           <style>{`@keyframes ped-spin { to { transform: rotate(360deg) } }`}</style>
         </div>

@@ -11,9 +11,12 @@ export default function StateTrajectoryPage() {
   const slopeCardRef = useRef(null)
   const tableCardRef = useRef(null)
 
+  // Derive both from the lock: hover has usually set activeLegend to this key already,
+  // so toggling activeLegend on its own would clear the highlight the click meant to lock.
   const handleLegendClick = (key) => {
-    setLockedLegend((prev) => (prev === key ? null : key))
-    setActiveLegend((prev) => (prev === key ? null : key))
+    const next = lockedLegend === key ? null : key
+    setLockedLegend(next)
+    setActiveLegend(next)
   }
 
   const handleLegendEnter = (key) => {

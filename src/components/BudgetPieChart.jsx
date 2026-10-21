@@ -68,7 +68,8 @@ export default function BudgetPieChart({ chartId, title, subtitle, note, agencie
   const { ref: pieRef, width: containerWidth } = useContainerSize()
   const cardRef = useRef(null)
 
-  const outerRadius = Math.min(175, Math.floor(containerWidth / 2) - 16) || 175
+  // Fall back to 175 until the width is measured (the old `|| 175` never fired: 0 width gave -16)
+  const outerRadius = containerWidth > 0 ? Math.min(175, Math.floor(containerWidth / 2) - 16) : 175
   const innerRadius = Math.round(outerRadius * 72 / 175)
   const chartHeight = Math.max(260, 2 * (outerRadius + 13) + 40)
 

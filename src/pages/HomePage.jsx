@@ -12,13 +12,15 @@ export default function HomePage() {
       </div>
 
       <div className="category-grid">
-        {categories.map(({ slug, label, description, preview, comingSoon }) => (
-          <Link key={slug} to={comingSoon ? '#' : `/${slug}`} className={`category-card${comingSoon ? ' coming-soon' : ''}`}
-            onClick={comingSoon ? (e) => e.preventDefault() : undefined}
-          >
+        {categories.map(({ slug, label, description, preview, comingSoon }) => {
+          // Coming-soon cards aren't links, so keyboard and screen-reader users don't land on a dead end.
+          const Card = comingSoon ? 'div' : Link
+          const cardProps = comingSoon ? { 'aria-disabled': 'true' } : { to: `/${slug}` }
+          return (
+          <Card key={slug} {...cardProps} className={`category-card${comingSoon ? ' coming-soon' : ''}`}>
             {preview && (
               <div className="card-preview">
-                <img src={import.meta.env.BASE_URL + preview} alt="" />
+                <img src={import.meta.env.BASE_URL + preview} alt="" width="200" height="140" loading="lazy" decoding="async" />
               </div>
             )}
             <div className="card-text">
@@ -30,8 +32,9 @@ export default function HomePage() {
               }}>Coming Soon!</span>}</h2>
               <p>{description}</p>
             </div>
-          </Link>
-        ))}
+          </Card>
+          )
+        })}
       </div>
     </div>
   )

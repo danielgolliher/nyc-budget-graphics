@@ -9,7 +9,11 @@ export default function Layout({ children }) {
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [pigeonsActive, setPigeonsActive] = useState(false)
   const [nightMode, setNightMode] = useState(() => {
-    return localStorage.getItem('nightMode') === 'true'
+    try {
+      return localStorage.getItem('nightMode') === 'true'
+    } catch {
+      return false
+    }
   })
   const location = useLocation()
   const pageUrl = `${window.location.origin}${location.pathname}`
@@ -20,12 +24,19 @@ export default function Layout({ children }) {
     setDropdownOpen(false)
   }
 
+  // Close the menus on any page change, including back/forward.
+  useEffect(closeMenu, [location.pathname])
+
   const anyChildActive = categories.some(({ slug }) => location.pathname === '/' + slug)
 
   // Sync night mode class on <html> element
   useEffect(() => {
     document.documentElement.classList.toggle('night-mode', nightMode)
-    localStorage.setItem('nightMode', nightMode)
+    try {
+      localStorage.setItem('nightMode', nightMode)
+    } catch {
+      // Storage blocked (private mode, embedded): the toggle still works for this visit.
+    }
   }, [nightMode])
 
   // Close dropdown on click outside or Escape
@@ -36,7 +47,10 @@ export default function Layout({ children }) {
       }
     }
     const handleEscape = (e) => {
-      if (e.key === 'Escape') setDropdownOpen(false)
+      if (e.key === 'Escape') {
+        setDropdownOpen(false)
+        setMenuOpen(false)
+      }
     }
     document.addEventListener('mousedown', handleClickOutside)
     document.addEventListener('keydown', handleEscape)
@@ -61,6 +75,7 @@ export default function Layout({ children }) {
             className={`navbar-toggle${menuOpen ? ' open' : ''}`}
             onClick={() => setMenuOpen((o) => !o)}
             aria-label="Toggle menu"
+            aria-expanded={menuOpen}
           >
             <span />
             <span />
@@ -71,12 +86,14 @@ export default function Layout({ children }) {
             <div
               className="nav-dropdown"
               ref={dropdownRef}
-              onMouseEnter={() => setDropdownOpen(true)}
-              onMouseLeave={() => setDropdownOpen(false)}
+              onPointerEnter={(e) => e.pointerType === 'mouse' && setDropdownOpen(true)}
+              onPointerLeave={(e) => e.pointerType === 'mouse' && setDropdownOpen(false)}
             >
               <button
                 className={`nav-dropdown-trigger${anyChildActive ? ' active' : ''}`}
                 onClick={() => setDropdownOpen((o) => !o)}
+                aria-expanded={dropdownOpen}
+                aria-haspopup="true"
               >
                 Explore
                 <svg
@@ -85,6 +102,7 @@ export default function Layout({ children }) {
                   height="6"
                   viewBox="0 0 10 6"
                   fill="none"
+                  aria-hidden="true"
                 >
                   <path d="M1 1l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
@@ -118,6 +136,7 @@ export default function Layout({ children }) {
               className={`pigeon-toggle${nightMode ? ' active' : ''}`}
               onClick={() => setNightMode((n) => !n)}
               title={nightMode ? 'Switch to day mode' : 'Switch to night mode'}
+              aria-pressed={nightMode}
             >
               Night
             </button>
@@ -125,6 +144,7 @@ export default function Layout({ children }) {
               className={`pigeon-toggle${pigeonsActive ? ' active' : ''}`}
               onClick={() => setPigeonsActive((p) => !p)}
               title={pigeonsActive ? 'Disable pigeons' : 'Release the pigeons'}
+              aria-pressed={pigeonsActive}
             >
               Pigeons
             </button>

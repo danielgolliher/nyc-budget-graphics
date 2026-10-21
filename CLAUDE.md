@@ -9,26 +9,28 @@ This is the **Maximum New York Data Viz & Art** site — a collection of interac
 
 ## Tech Stack
 - **Vite** + **React 18** (JSX, no TypeScript)
-- **React Router v6** with `BrowserRouter` (clean URLs, no hash)
+- **React Router v7** (declarative mode) with `BrowserRouter` (clean URLs, no hash)
 - **Recharts** for chart visualizations
 - **html2canvas** for PNG downloads
 - **qrcode.react** for QR codes on pages and in downloads
-- **gh-pages** for deployment
+- **GitHub Actions** for deployment (`.github/workflows/deploy.yml` publishes to the `gh-pages` branch on every push to `main`)
 
 ## Key Commands
 - `npm run dev` — local dev server (Vite)
 - `npm run build` — production build to `dist/`
-- `npm run deploy` — build + deploy to GitHub Pages (`vite build && gh-pages -d dist`)
+- `npm run deploy` — manual build + deploy from your machine (`vite build && gh-pages -d dist --nojekyll`). Normally unnecessary: pushing `main` deploys automatically
 
 ## Architecture
 
 ### Routing
-- `src/main.jsx` — BrowserRouter wrapper
+- `src/main.jsx` — BrowserRouter wrapper; strips a trailing slash from the URL so every page has one canonical address
 - `src/App.jsx` — Two route modes:
   - **Normal routes** (`/`, `/<slug>`) — wrapped in `Layout` (navbar + footer)
   - **Embed routes** (`/embed/<slug>`) — same page components but wrapped in `.embed-wrapper` which hides page headers, share buttons, and chrome via CSS
-- `public/404.html` + script in `index.html` — SPA redirect trick for GitHub Pages (rewrites paths to query params and back)
-- **Per-route `index.html` files** in `public/<slug>/` — each has page-specific OG/Twitter meta tags for rich social media previews, plus the same SPA redirect script so browsers still land in the React app. GitHub Pages serves these directly (not via 404), so crawlers see the meta tags.
+  - Also: a "Page not found" route, an error boundary that reloads once if a page's code chunk is missing after a deploy, scroll-to-top and tab-title updates on navigation
+- **Generated page files** (`scripts/site-pages.js`, a Vite plugin). At build time it writes `dist/<slug>.html` and `dist/<slug>/index.html` for every entry in `categories.js` (and the same under `embed/`), each a copy of the app shell with that page's `<title>`, description, canonical link and OG/Twitter tags. GitHub Pages serves them with a 200, so crawlers and link unfurlers see the right tags and visitors land straight in the app (no redirect). It also writes `404.html` (the app shell, which shows the "Page not found" route), `sitemap.xml`, `robots.txt` and `.nojekyll`
+- **Content-Security-Policy**: the same plugin adds a CSP `<meta>` tag to every built page (GitHub Pages can't send headers). Inline scripts in `index.html` are allowed by hash automatically. **If a page starts loading images, data or scripts from a new host, add the host to `contentSecurityPolicy()` in `scripts/site-pages.js`**, or the browser will block it. The CSP is only in the build, so check new hosts with `npm run build && npm run preview`
+- Old `/?/<slug>` links from the previous redirect setup still work (small script in `index.html`)
 - **Homepage** (`src/pages/HomePage.jsx`) — Shows all visualization cards from `categories.js`, with subtitle containing contact info (email `daniel@maximumnewyork.com` + LinkedIn/X links)
 
 ### Adding a New Visualization
@@ -37,21 +39,23 @@ This is the **Maximum New York Data Viz & Art** site — a collection of interac
    - `page-container` > `page-header` (title + subtitle) > `chart-card` (with `dark-card` class if dark theme)
    - Include `ShareMenu` with `chartRef`, `chartId`, `title`, and `dark` prop if dark card
 3. Create a preview SVG thumbnail in `public/previews/` (200×140, simplified visual)
-4. Add entry to `src/categories.js` with `slug`, `label`, `description`, `preview`, and lazy-loaded `component`. Optionally add `navLabel` for a shorter name in the nav dropdown (falls back to `label`)
-5. Everything else (routing, nav links, embed routes, homepage card) is automatic from the categories array
+4. Add an entry to `src/categories.js` with `slug`, `label`, `description`, `preview`. Optional: `navLabel` (shorter nav name), and the social-preview fields `title`, `metaDescription`, `shareDescription`, `image` (see the comment at the top of the file)
+5. Add the lazy-loaded page component to `src/pageComponents.js` under the same slug
+6. Everything else (routing, nav links, embed routes, homepage card, page HTML with social tags, sitemap) is automatic
 
 ### Key Files
 | File | Purpose |
 |------|---------|
-| `src/categories.js` | Central registry of all visualizations — drives nav, routes, homepage grid, and embed routes. Optional `navLabel` field for shorter dropdown names |
+| `src/categories.js` | Central registry of all visualizations (plain data, also read by the build) — drives nav, routes, homepage grid, embed routes, page titles, social tags and the sitemap. Optional `navLabel` field for shorter dropdown names |
+| `src/pageComponents.js` | Slug → lazy-loaded page component |
+| `scripts/site-pages.js` | Vite plugin: per-page HTML files with social tags, 404.html, sitemap.xml, robots.txt, CSP |
 | `src/components/Layout.jsx` | Navbar (with "MNY" monogram, "Explore" dropdown menu, "Pigeons" toggle, mobile hamburger), footer (with QR code + X/LinkedIn social links) |
 | `src/components/PigeonOverlay.jsx` | Site-wide 2D canvas pigeon particle effect — ~28 pigeons + drifting feathers, toggled from navbar |
 | `src/components/ShareMenu.jsx` | Link/Download/Embed buttons + QR code per chart card |
 | `src/index.css` | All styles including navbar, cards, dark-card theme, embed wrapper, responsive/mobile |
 | `src/App.jsx` | Route definitions for normal and embed modes |
-| `index.html` | Google Fonts (Source Serif 4, JetBrains Mono, DM Sans, IBM Plex Sans), analytics, SPA redirect script |
+| `index.html` | App shell: Google Fonts (Source Serif 4, JetBrains Mono, DM Sans), analytics, night-mode boot script, `<!--page-meta-->` placeholder the build fills per page |
 | `public/CNAME` | Custom domain — **do not delete** or deploys will break the domain |
-| `public/<slug>/index.html` | Per-route HTML files with page-specific OG/Twitter meta tags + SPA redirect script — enables rich social media previews for each page |
 | `public/og-met-explorer.jpg` | Met Explorer social preview image (Degas' *The Dance Class*) |
 | `public/data/nyc_fy_inflation_data.csv` | BLS CPI-U inflation data (FY2001–2025, NYC Metro Area) — downloadable source for inflation overlay |
 | `public/data/state_population_rankings_1960_2025.csv` | State population data (1960 Census vs. 2025 estimates) — downloadable from State Trajectory page |
@@ -84,7 +88,7 @@ This is the **Maximum New York Data Viz & Art** site — a collection of interac
    - Key files: `src/data/nycPayroll2025.js` (all data + filtered variants), `src/components/PayrollCharts.jsx` (6 chart components + PayrollStats + shared utilities), `src/pages/PayrollPage.jsx` (page wrapper)
 6. **Met Museum Explorer** (`/met-explorer`) — Interactive gallery for browsing 500,000+ artworks from The Met's open collection API (`collectionapi.metmuseum.org`). Warm cream/gold design theme distinct from other pages.
    - **Hero image**: Featured artwork displayed as full-width banner with gradient overlay showing title, artist, and date. Click to open detail view. "Next" arrow button (→) on hover (always visible on mobile) swaps a random gallery artwork into the hero slot.
-   - **Search**: Free-text search bar that queries the Met API. Results replace the gallery grid. Placeholder dynamically shows department name when a department filter is active (e.g. "Search in European Paintings..."). During loading with a department filter, a context line shows "Searching in {department}..."
+   - **Search**: Free-text search bar that queries the Met API's paginated `/v1.1/search` endpoint (first 500 IDs; the old `/v1/search` was retired 2026-10-01 and returns 410). Results replace the gallery grid. Placeholder dynamically shows department name when a department filter is active (e.g. "Search in European Paintings..."). During loading with a department filter, a context line shows "Searching in {department}..."
    - **Department filters**: Chip buttons for 19 Met departments. "All" chip is visually distinct (dashed border, bold text) with a vertical separator after it. Chips wrap on desktop (`flex-wrap`) for full visibility; horizontally scroll on mobile (`max-width: 600px`).
    - **Surprise Me**: Button that picks a random department and loads its artworks with shuffled results.
    - **Gallery grid**: 4-column card grid (3 on tablet, 2 on mobile) with 3:4 aspect ratio image thumbnails, title, and artist. Lazy-loaded images, staggered fade-in animation. **Infinite scroll** via `IntersectionObserver` on a sentinel div — auto-loads next batch of 12 when scrolling near the bottom. Loading indicator shown during fetch.
@@ -99,33 +103,34 @@ This is the **Maximum New York Data Viz & Art** site — a collection of interac
    - **Tip banner**: Gold-bordered note at top of page explaining the star-and-email feature.
    - **Data source**: Met Museum Open Access API (no API key required). Initial load uses 12 pre-verified European Paintings seed IDs, then background-fetches full department list for load-more. Object cache (`useRef(Map)`) prevents redundant fetches. `AbortController` cancels in-flight requests on navigation.
    - **Design**: Warm cream background (`#FDFBF7`), gold accent (`#B8860B`), shimmer skeleton loaders, card hover lift. Self-contained styles in `metExplorerStyles.css` with CSS custom properties (`--met-gold`, `--met-cream`, etc.).
-   - **Email infrastructure**: Cloudflare Worker in `email-worker/` directory. Resend API key stored as Worker secret (`wrangler secret put RESEND_API_KEY`). CORS locked to `data.maximumnewyork.com` + localhost. Input validation (email format, 1–100 favorites). Deploy with `cd email-worker && npx wrangler deploy`.
+   - **Email infrastructure**: Cloudflare Worker in `email-worker/` directory. Resend API key stored as Worker secret (`wrangler secret put RESEND_API_KEY`). The worker only accepts JSON POSTs whose `Origin` is the site or localhost, caps the body at 64 KB and the list at 40 favorites, rate-limits per IP (5/min) and per recipient (1/min) via the Rate Limiting bindings in `wrangler.toml`, and rebuilds every item from the Met API by object ID (client text is used only if the Met API is unreachable, and is cleaned and escaped). Links always point to metmuseum.org and images to images.metmuseum.org. Deploy with `cd email-worker && npx wrangler deploy`.
    - Key files: `src/components/MetExplorer.jsx` (all sub-components + main component), `src/components/metExplorerStyles.css` (styles), `src/pages/MetExplorerPage.jsx` (page wrapper), `email-worker/index.js` (Cloudflare Worker)
 
-7. **Large Loads** (`/large-loads`) — Interactive guide to data centers, the grid, and Texas vs. New York large-load rules. A self-contained page mirrored from the `danielgolliher/large-loads` repo (also live at danielgolliher.github.io/large-loads): the app is `public/large-loads/guide.html`, shown full-height under the navbar by an iframe in `src/pages/LargeLoadsPage.jsx` (no page header; the guide has its own title). A small script at the end of `guide.html` opens outside links in a new tab when framed. To update, copy the large-loads repo's `index.html` over `guide.html` and keep that script. Social preview: `public/large-loads/index.html` + `public/og-large-loads.png`.
+7. **Large Loads** (`/large-loads`) — Interactive guide to data centers, the grid, and Texas vs. New York large-load rules. A self-contained page mirrored from the `danielgolliher/large-loads` repo (also live at danielgolliher.github.io/large-loads): the app is `public/large-loads/guide.html`, shown full-height under the navbar by an iframe in `src/pages/LargeLoadsPage.jsx` (no page header; the guide has its own title). A small script at the end of `guide.html` opens outside links in a new tab when framed. To update, copy the large-loads repo's `index.html` over `guide.html` and keep that script. Social preview: the `large-loads` entry in `src/categories.js` + `public/og-large-loads.png`.
 
 ### Design System
 - **Brand color**: `#BE5343` (Maximum New York red) — set as `--color-accent` in CSS
 - **Navbar**: Glassmorphism (`rgba` background + `backdrop-filter: blur(8px)`), 64px height (`--nav-height`). "MNY" monogram pill (JetBrains Mono) next to brand name. "Explore" dropdown groups all visualization links — desktop: hover/click to open, white glass panel with fade-in animation, active page gets red left bar, trigger gets white underline when any child page is active. Closes on click-outside or Escape. "Pigeons" pill toggle activates a site-wide canvas particle overlay (~28 pigeon silhouettes with wing-flap/coast cycles + drifting feathers); warm muted palette, `pointer-events: none` so site remains interactive. Mobile: dropdown items display directly in slide-out (no extra tap), trigger becomes uppercase "EXPLORE" section header, chevron hidden. Mobile slide-out also uses glassmorphism.
 - **Dark cards**: `#0a0e17` background, used for State Trajectory and Growth Chart
 - **Light cards**: White background, used for Expense Budget
-- **Fonts**: Source Serif 4 (display), DM Sans (body), JetBrains Mono (mono), IBM Plex Sans (Growth Chart component)
+- **Fonts**: Source Serif 4 (display), DM Sans (body), JetBrains Mono (mono)
 - **QR codes**: Appear in footer (every page) and top-right of each chart card; included in PNG downloads
 - **Mobile responsive** (`@media max-width: 768px` in `index.css`): page container tightened to `24px 16px` padding, page header reduced margins, homepage category grid goes single-column, chart cards `20px 16px` padding, pie chart layout stacks vertically, slope table/legend get tighter padding. Individual components also adapt via JS (SlopeChart responsive margins, GrowthChart touch targets) and `clamp()` (Budget Through the Years padding). All text inputs use 16px font to prevent iOS Safari auto-zoom.
 
 ### ShareMenu Behavior
-- **Link**: Copies canonical page URL (uses `useLocation` for clean path)
+- **Link**: Copies canonical page URL (uses `useLocation`; strips any trailing slash or `/embed` prefix). Falls back to `execCommand('copy')` where the Clipboard API is unavailable
 - **Download**: html2canvas capture of `chartRef`, excludes `.share-menu-controls` (but keeps QR), adds red credit bar with attribution
 - **Embed**: Generates iframe pointing to `/embed/<slug>` route (chart-only, no site chrome)
 
 ### Social Media Previews (Open Graph)
-- Each page has a `public/<slug>/index.html` with `og:title`, `og:description`, `og:image`, and Twitter Card meta tags
-- Default OG image: `og-image.png` (used by most pages)
-- Met Explorer uses `og-met-explorer.jpg` (Degas' *The Dance Class*, downloaded from Met API)
-- To add a preview for a new page: create `public/<slug>/index.html` following the pattern in existing files (meta tags + SPA redirect script)
+- Generated at build time from `src/categories.js` by `scripts/site-pages.js` (see Routing). Edit the page's `title` / `metaDescription` / `shareDescription` / `image` fields there
+- Default OG image: `og-image.jpg` (1200×675, ~200 KB). `og-image.png` is the 2560×1440 original, kept so previews already cached by social sites keep working
+- Met Explorer uses `og-met-explorer.jpg` (Degas' *The Dance Class*, downloaded from Met API); Large Loads uses `og-large-loads.png`
 
 ### Deployment Notes
-- Always use `npm run deploy` which builds and pushes to `gh-pages` branch
-- The `public/CNAME` file is critical — it gets copied to `dist/` and preserves the custom domain
+- Pushing to `main` deploys automatically (`.github/workflows/deploy.yml`: `npm ci`, `npm run build`, publish `dist/` to `gh-pages`). Watch it in the repo's Actions tab
+- The weekly `refresh-bills.yml` job (Fridays) commits fresh Council Quest bill data to `main` and deploys on its own, since pushes made by Actions don't trigger other workflows. Its script refuses to write if the bill count drops, most districts come back empty, or the game script stops parsing; it exits without committing when nothing changed. Both workflows share a `gh-pages` concurrency group so they never deploy at the same time
+- `npm run deploy` still works for a manual deploy from your machine, but it publishes your local working tree, uncommitted changes included
+- The `public/CNAME` file is critical — it gets copied to `dist/` and preserves the custom domain (the workflows also pass `cname:`)
 - GitHub Pages takes 1-2 minutes to update after deploy (occasionally up to 10)
-- After pushing to `main`, also run `npm run deploy` to update the live site
+- Workflow actions are pinned to commit SHAs (with the version in a comment). Bump them together when updating

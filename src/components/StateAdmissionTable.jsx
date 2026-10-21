@@ -68,6 +68,14 @@ export default function StateAdmissionTable() {
     whiteSpace: 'nowrap', userSelect: 'none',
   })
 
+  // Click or keyboard (Enter/Space) sorting for the sortable headers
+  const sortProps = (col) => ({
+    onClick: () => handleSort(col),
+    onKeyDown: (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleSort(col) } },
+    tabIndex: 0,
+    'aria-sort': sortCol === col ? (sortAsc ? 'ascending' : 'descending') : 'none',
+  })
+
   const arrow = (col) => (
     <span style={{ fontSize: 11, marginLeft: 4, opacity: sortCol === col ? 1 : 0.4 }}>
       {sortCol === col ? (sortAsc ? '▲' : '▼') : '▲'}
@@ -170,13 +178,13 @@ export default function StateAdmissionTable() {
         <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 900, fontSize: 14 }}>
           <thead>
             <tr>
-              <th style={{ ...thStyle(0), width: 42, textAlign: 'center' }} onClick={() => handleSort(0)}>
+              <th style={{ ...thStyle(0), width: 42, textAlign: 'center' }} {...sortProps(0)}>
                 # {arrow(0)}
               </th>
-              <th style={{ ...thStyle(1), width: 120 }} onClick={() => handleSort(1)}>
+              <th style={{ ...thStyle(1), width: 120 }} {...sortProps(1)}>
                 State {arrow(1)}
               </th>
-              <th style={{ ...thStyle(2), width: 130 }} onClick={() => handleSort(2)}>
+              <th style={{ ...thStyle(2), width: 130 }} {...sortProps(2)}>
                 Admitted {arrow(2)}
               </th>
               <th style={{ ...thStyle(3), width: 260 }}>

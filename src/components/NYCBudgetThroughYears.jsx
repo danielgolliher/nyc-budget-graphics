@@ -176,6 +176,11 @@ const DetailPanel = ({ data, label, locked, onUnlock }) => {
 
 const NoTooltip = () => null;
 
+/* Keyboard access: accessibilityLayer lets Tab focus a chart and the arrow keys step through
+   years (it fires onMouseMove, so the detail panel and its source link follow). A mouse press
+   is kept from focusing the chart, since focus jumps the hover to the keyboard's year. */
+const preventMouseFocus = (_, e) => e?.preventDefault();
+
 const CustomDot = (props) => {
   const { cx, cy, payload } = props;
   if (!cx || !cy) return null;
@@ -287,9 +292,16 @@ export default function NYCBudgetChart() {
 
   const createCompositeDownload = useCallback(async (chartRef, chartId, lockedData) => {
     if (!chartRef.current || !headerRef.current) return;
+    let headerClone = null;
+    let detailPanel = null;
+    // Undo the temporary DOM changes below; safe to call twice (also runs if html2canvas throws)
+    const restoreDom = () => {
+      if (headerClone) { headerClone.remove(); headerClone = null; }
+      if (detailPanel && !lockedData) detailPanel.style.display = "";
+    };
     try {
       // Clone header and prepend to chart card
-      const headerClone = headerRef.current.cloneNode(true);
+      headerClone = headerRef.current.cloneNode(true);
       headerClone.style.marginBottom = "24px";
 
       // Replace <select> elements with plain text spans using React state values
@@ -310,7 +322,7 @@ export default function NYCBudgetChart() {
       chartRef.current.insertBefore(headerClone, chartRef.current.firstChild);
 
       // Hide empty detail panel if no locked data
-      const detailPanel = chartRef.current.querySelector("[data-detail-panel]");
+      detailPanel = chartRef.current.querySelector("[data-detail-panel]");
       if (detailPanel && !lockedData) detailPanel.style.display = "none";
 
       const canvas = await html2canvas(chartRef.current, {
@@ -321,8 +333,7 @@ export default function NYCBudgetChart() {
       });
 
       // Restore DOM
-      chartRef.current.removeChild(headerClone);
-      if (detailPanel && !lockedData) detailPanel.style.display = "";
+      restoreDom();
 
       // Add credit bar
       const creditH = 40;
@@ -349,6 +360,8 @@ export default function NYCBudgetChart() {
       link.click();
     } catch (err) {
       console.error("Download failed:", err);
+    } finally {
+      restoreDom();
     }
   }, [pageUrl, startFY, endFY]);
 
@@ -471,7 +484,7 @@ export default function NYCBudgetChart() {
           <div style={{ background: "rgba(15,23,42,0.6)", border: "1px solid rgba(51,65,85,0.4)", borderRadius: "14px", padding: "24px 12px 16px 0", cursor: "crosshair" }}
             onMouseLeave={() => { if (!lockedBudget) setHoveredBudget(null); }}>
             <ResponsiveContainer width="100%" height={380}>
-              <ComposedChart data={budgetData} margin={{ top: 16, right: showInflation ? 48 : 24, left: 16, bottom: 8 }} onMouseMove={lockedBudget ? undefined : handleBudgetHover} onClick={handleBudgetClick}>
+              <ComposedChart data={budgetData} margin={{ top: 16, right: showInflation ? 48 : 24, left: 16, bottom: 8 }} onMouseMove={lockedBudget ? undefined : handleBudgetHover} onClick={handleBudgetClick} accessibilityLayer onMouseDown={preventMouseFocus}>
                 <defs>
                   <linearGradient id="budgetGradient" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor={chartColor} stopOpacity={0.25} />
@@ -527,7 +540,7 @@ export default function NYCBudgetChart() {
           <div style={{ background: "rgba(15,23,42,0.6)", border: "1px solid rgba(51,65,85,0.4)", borderRadius: "14px", padding: "24px 12px 16px 0", cursor: "crosshair" }}
             onMouseLeave={() => { if (!lockedPct) setHoveredPct(null); }}>
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={pctData} margin={{ top: 16, right: 24, left: 16, bottom: 8 }} onMouseMove={lockedPct ? undefined : handlePctHover} onClick={handlePctClick}>
+              <BarChart data={pctData} margin={{ top: 16, right: 24, left: 16, bottom: 8 }} onMouseMove={lockedPct ? undefined : handlePctHover} onClick={handlePctClick} accessibilityLayer onMouseDown={preventMouseFocus}>
                 <CartesianGrid stroke="rgba(51,65,85,0.3)" strokeDasharray="3 3" vertical={false} />
                 <XAxis dataKey="fy" stroke="#334155" tick={{ fill: "#64748B", fontSize: 11, fontFamily: mono }} tickLine={false} axisLine={{ stroke: "#334155" }} tickFormatter={(v) => `'${String(v).slice(2)}`} interval={Math.max(1, Math.floor(pctData.length / 14))} />
                 <YAxis stroke="#334155" tick={{ fill: "#64748B", fontSize: 11, fontFamily: mono }} tickLine={false} axisLine={false} tickFormatter={(v) => `${v}%`} domain={[Math.floor(pctMin) - 1, Math.ceil(pctMax) + 1]} />

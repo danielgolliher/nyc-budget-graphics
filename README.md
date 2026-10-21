@@ -1,6 +1,6 @@
-# New York City Budget Graphics
+# Maximum New York Data Viz & Art
 
-A static site for interactive visualizations of New York City's expense budget, built with React + Vite and deployed to GitHub Pages.
+Interactive visualizations of New York City data, live at **https://data.maximumnewyork.com**. Built with React + Vite and hosted on GitHub Pages.
 
 ## Quick Start
 
@@ -8,45 +8,34 @@ A static site for interactive visualizations of New York City's expense budget, 
 npm install
 npm run dev       # local dev server at localhost:5173
 npm run build     # production build to /dist
-npm run deploy    # deploy to GitHub Pages
+npm run preview   # serve the production build locally (includes the Content-Security-Policy)
 ```
 
-## Deployment (GitHub Pages)
+## Deployment
 
-1. Create a GitHub repo (e.g., `nyc-budget-graphics`)
-2. Update `base` in `vite.config.js` to match your repo name: `'/nyc-budget-graphics/'`
-3. Push to GitHub
-4. Run `npm run deploy` — this builds and pushes to the `gh-pages` branch
-5. In repo Settings → Pages, set source to the `gh-pages` branch
+Pushing to `main` deploys automatically: `.github/workflows/deploy.yml` builds the site and publishes `dist/` to the `gh-pages` branch, which GitHub Pages serves on the custom domain in `public/CNAME`. `npm run deploy` does the same from your machine if you ever need it.
 
 ## Project Structure
 
 ```
 src/
-  components/
-    Layout.jsx              # Navbar + footer wrapper
-    BudgetPieChart.jsx      # Reusable interactive pie/donut chart
-  data/
-    fy2026.js               # FY2026 adopted budget data
-    fy2027.js               # FY2027 preliminary budget data
-  pages/
-    ExpenseBudgetPage.jsx   # Main page rendering budget charts
-  App.jsx                   # Routes
-  main.jsx                  # Entry point
-  index.css                 # Global styles
+  categories.js       # Registry of every page: nav, homepage cards, routes, titles, social tags
+  pageComponents.js   # Slug → lazy-loaded page component
+  App.jsx             # Routes (normal + /embed/<slug>), 404, error boundary
+  components/         # Charts, Layout (navbar + footer), ShareMenu
+  pages/              # One wrapper per visualization
+  data/               # Data files
+scripts/
+  site-pages.js       # Vite plugin: per-page HTML with social tags, 404, sitemap, robots, CSP
+  refresh-bills.mjs   # Weekly Council Quest bill refresh (run by GitHub Actions)
+email-worker/         # Cloudflare Worker that emails Met Explorer favorites
 docs/
-  CHART_STYLE.md            # Chart design spec for replication
-  ADDING_DATA.md            # How to add new fiscal year data
+  CHART_STYLE.md      # Chart design spec
+  ADDING_DATA.md      # Adding a new fiscal year of budget data
 ```
 
-## Adding New Charts
-
-See `docs/ADDING_DATA.md` for step-by-step instructions on adding a new fiscal year or chart type.
-
-## Design Reference
-
-See `docs/CHART_STYLE.md` for the complete design specification, including color palette, typography, component API, and layout rules. This file is written so that an AI assistant (Claude) can read it and produce new charts consistent with the existing style.
+See `CLAUDE.md` for the full architecture, how to add a page, and deployment details.
 
 ## Data Sources
 
-All budget figures come from the NYC Office of Management and Budget's "Summary of the Expense Budget by Agency" tables, published as part of the annual budget documents.
+Each page cites its sources. Budget figures come from the NYC Office of Management and Budget's "Summary of the Expense Budget by Agency" tables, published with the annual budget documents.

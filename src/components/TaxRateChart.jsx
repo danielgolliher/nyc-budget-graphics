@@ -40,7 +40,8 @@ export default function TaxRateChart() {
     canvas.style.height = CSS_H + 'px'
     const ctx = canvas.getContext('2d')
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-    stateRef.current.startTime = null
+    // Don't reset startTime here: drawing is time-based, and a reset while paused made the
+    // paused time negative (blank chart). It also restarted playback on every resize.
   }, [])
 
   const draw = useCallback((t) => {
@@ -250,6 +251,17 @@ export default function TaxRateChart() {
     setTooltip(null)
   }, [])
 
+  // Commit scrub position as paused state
+  const commitScrub = useCallback(() => {
+    const s = stateRef.current
+    if (s.scrubT != null) {
+      s.pausedAt = performance.now()
+      s.startTime = s.pausedAt - s.scrubT
+      s.scrubT = null
+    }
+    setPaused(true)
+  }, [])
+
   return (
     <div style={{ overflow: 'hidden', maxWidth: '100%' }}>
       <div style={{ marginBottom: 12 }}>
@@ -372,25 +384,11 @@ export default function TaxRateChart() {
             stateRef.current.scrubT = t
             setScrubValue(val)
           }}
-          onMouseUp={() => {
-            // Commit scrub position as paused state
-            const s = stateRef.current
-            if (s.scrubT != null) {
-              s.pausedAt = performance.now()
-              s.startTime = s.pausedAt - s.scrubT
-              s.scrubT = null
-            }
-            setPaused(true)
-          }}
-          onTouchEnd={() => {
-            const s = stateRef.current
-            if (s.scrubT != null) {
-              s.pausedAt = performance.now()
-              s.startTime = s.pausedAt - s.scrubT
-              s.scrubT = null
-            }
-            setPaused(true)
-          }}
+          onMouseUp={commitScrub}
+          onTouchEnd={commitScrub}
+          // Arrow keys change the value with no mouse/touch end; without this the animation
+          // stayed frozen on the scrub position and Play did nothing.
+          onKeyUp={() => { if (stateRef.current.scrubT != null) commitScrub() }}
           style={{ width: '100%', accentColor: NAVY }}
         />
       </div>
