@@ -6,6 +6,9 @@ name: Deploy site
 on:
   push:
     branches: [main]
+    # The email worker deploys separately (wrangler), so changes to it alone don't rebuild the site.
+    paths-ignore:
+      - "email-worker/**"
   workflow_dispatch:
 
 permissions:

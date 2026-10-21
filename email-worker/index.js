@@ -194,8 +194,8 @@ async function lookUpFavorite(art, id) {
   }
 }
 
-// Per-isolate fallback when the Rate Limiting bindings (see wrangler.toml) aren't configured.
-// Isolates are short-lived and per data center, so this only slows down a single noisy client.
+// Per-isolate limiter. Isolates are short-lived and per machine, so on its own this only
+// slows down a single noisy client; it backs up the Rate Limiting bindings below.
 const recentHits = new Map()
 function localLimit(key, limit, periodMs) {
   const now = Date.now()
@@ -207,11 +207,16 @@ function localLimit(key, limit, periodMs) {
   return true
 }
 
+// The bindings (see wrangler.toml) are shared across Cloudflare but only loosely consistent:
+// in testing, a quick burst of 12 requests got past a 5-per-minute limit. The per-isolate
+// check catches bursts that land on one machine, so both have to pass.
 async function withinRateLimits(env, ip, recipient) {
   const checks = [
-    env.IP_LIMIT ? env.IP_LIMIT.limit({ key: ip }).then((r) => r.success) : localLimit(`ip:${ip}`, 5, 60000),
-    env.RECIPIENT_LIMIT ? env.RECIPIENT_LIMIT.limit({ key: recipient }).then((r) => r.success) : localLimit(`to:${recipient}`, 1, 60000),
+    localLimit(`ip:${ip}`, 5, 60000),
+    localLimit(`to:${recipient}`, 1, 60000),
   ]
+  if (env.IP_LIMIT) checks.push(env.IP_LIMIT.limit({ key: ip }).then((r) => r.success))
+  if (env.RECIPIENT_LIMIT) checks.push(env.RECIPIENT_LIMIT.limit({ key: recipient }).then((r) => r.success))
   return (await Promise.all(checks)).every(Boolean)
 }
 
