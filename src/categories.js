@@ -117,6 +117,14 @@ const categories = [
     component: lazy(() => import('./pages/PedestrianTrafficPage')),
   },
   {
+    slug: 'large-loads',
+    label: 'Large Loads',
+    description:
+      'Data centers, the grid, and the rules Texas and New York are writing for them.',
+    preview: 'previews/large-loads.svg',
+    component: lazy(() => import('./pages/LargeLoadsPage')),
+  },
+  {
     slug: 'make-your-own',
     label: 'Make Your Own',
     description:
