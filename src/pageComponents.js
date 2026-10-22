@@ -16,6 +16,7 @@ const pageComponents = {
   'council-quest': lazy(() => import('./pages/CouncilQuestPage')),
   'pedestrian-traffic': lazy(() => import('./pages/PedestrianTrafficPage')),
   'large-loads': lazy(() => import('./pages/LargeLoadsPage')),
+  lawbook: lazy(() => import('./pages/LawbookPage')),
   'make-your-own': lazy(() => import('./pages/MakeYourOwnPage')),
 }
 

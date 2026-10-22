@@ -175,6 +175,19 @@ const categories = [
     preview: 'previews/large-loads.svg',
   },
   {
+    slug: 'lawbook',
+    label: '119th Congress Lawbook',
+    navLabel: 'Lawbook',
+    description:
+      'Every public law of the 119th Congress: what it does, who sponsored it, how the votes split and how long it took.',
+    metaDescription:
+      'Explore every public law of the 119th Congress: what each one does, who sponsored it, how the floor votes split and how long it took to become law.',
+    image: 'og-lawbook.png',
+    imageWidth: 1200,
+    imageHeight: 630,
+    preview: 'previews/lawbook.svg',
+  },
+  {
     slug: 'make-your-own',
     label: 'Make Your Own',
     description:
