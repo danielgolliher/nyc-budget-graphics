@@ -1,1 +1,0 @@
-import{j as a}from"./index-iXVMTKKp.js";function r(){return a.jsx("iframe",{src:"/large-loads/guide.html",title:"Large Loads",style:{display:"block",width:"100%",height:"calc(100svh - var(--nav-height))",border:0,background:"#0f2d6b"}})}export{r as default};

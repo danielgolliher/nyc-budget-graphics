@@ -1,0 +1,1 @@
+import{j as t}from"./index-BefJWWyu.js";function s(){const o=/^#law-119-\d+$/.test(window.location.hash)?window.location.hash:"";return t.jsx("iframe",{src:`/lawbook/app.html${o}`,title:"119th Congress Lawbook",style:{display:"block",width:"100%",height:"calc(100svh - var(--nav-height))",border:0}})}export{s as default};
